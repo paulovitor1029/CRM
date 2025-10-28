@@ -70,6 +70,30 @@ Depois rode: `php artisan pest:install` (se aplicável) e `composer dump-autoloa
   - `/api/items` (CRUD protegido por `can:items.*`).
   - `/api/reports/sector/{setor}` (perm `reports.view` + atributo `setor`).
 
+## Setores e Fluxos
+- Sectors
+  - GET `/api/sectors` — lista setores
+  - POST `/api/sectors` — cria (`{ tenant_id?, name, description? }`)
+- Flows
+  - GET `/api/flows?tenant_id=default` — lista com estados e transições
+  - POST `/api/flows` — cria nova versão
+    - Exemplo de payload:
+      ```json
+      {
+        "tenant_id": "default",
+        "key": "onboarding",
+        "name": "Onboarding",
+        "states": [
+          { "key": "draft", "name": "Draft", "initial": true },
+          { "key": "done", "name": "Done", "terminal": true }
+        ],
+        "transitions": [
+          { "key": "submit", "from": "draft", "to": "done" }
+        ]
+      }
+      ```
+  - POST `/api/flows/{id}/publish` — publica e congela a versão atual (cria auditoria em `flow_logs`).
+
 ## Troubleshooting
 - Se `vendor/` não existir, execute `make composer-install`.
 - Se a aplicação não responder, verifique logs: `make logs`.

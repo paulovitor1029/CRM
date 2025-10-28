@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\ItemController;
 use Illuminate\Support\Facades\Gate;
+use App\Http\Controllers\SectorController;
+use App\Http\Controllers\FlowController;
 use App\Http\Middleware\DeviceSessionEnforcer;
 use App\Http\Middleware\EnforcePasswordPolicy;
 use App\Http\Middleware\RequestIdMiddleware;
@@ -39,4 +41,16 @@ Route::middleware([RequestIdMiddleware::class, 'auth'])->group(function () {
         Gate::authorize('reports.view', ['setor' => $setor]);
         return response()->json(['report' => 'ok', 'setor' => $setor]);
     })->middleware('can:reports.view');
+});
+
+// Sectors & Flows API
+Route::middleware([RequestIdMiddleware::class])->group(function () {
+    // Sectors
+    Route::get('/sectors', [SectorController::class, 'index']);
+    Route::post('/sectors', [SectorController::class, 'store']);
+
+    // Flows
+    Route::get('/flows', [FlowController::class, 'index']);
+    Route::post('/flows', [FlowController::class, 'store']);
+    Route::post('/flows/{id}/publish', [FlowController::class, 'publish']);
 });

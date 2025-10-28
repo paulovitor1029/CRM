@@ -40,8 +40,6 @@ Este documento descreve a arquitetura, padrões e requisitos de operação do Fa
 - Testes: `make test` / `make coverage`.
 - Lint: `make lint`.
 
-Este arquivo deve ser mantido atualizado conforme novas decisões/implementações.
-
 ## Autenticação
 - Sessões em Redis (`SESSION_DRIVER=redis`).
 - Endpoints:
@@ -82,3 +80,39 @@ Este arquivo deve ser mantido atualizado conforme novas decisões/implementaçõ
 - Rotas de exemplo protegidas:
   - CRUD `/api/items` com `can:items.*`.
   - `/api/reports/sector/{setor}` exige `reports.view` + ABAC `setor` via `Gate::authorize('reports.view', ['setor'=>...])`.
+
+## Setores e Fluxos
+- Tabelas
+  - `sectors` (unicidade por `tenant_id` + `name`)
+  - `flow_definitions` (`tenant_id`, `key`, `version`, `frozen`, `published_at`)
+  - `flow_states` (chaves únicas por fluxo, `initial`, `terminal`)
+  - `flow_transitions` (referenciam estados do mesmo fluxo)
+  - `flow_logs` (auditoria:
+    - `publish` gera log com `details={ key, version }`)
+- Endpoints
+  - GET `/api/sectors` — lista setores
+  - POST `/api/sectors` — cria setor (`tenant_id` default `default`)
+  - GET `/api/flows` — lista definições (por `tenant_id` query param, default `default`)
+  - POST `/api/flows` — cria nova versão de um fluxo (valida 1+ inicial e 1+ terminal; transições referem estados válidos)
+  - POST `/api/flows/{id}/publish` — publica e congela a versão (não pode publicar novamente)
+- Versionamento e publicação
+  - `POST /flows` sempre cria nova versão (`version = max + 1` por `tenant_id,key`).
+  - Publicar congela (`frozen=true`) e define `published_at`; cria entrada em `flow_logs`.
+
+## Setores e Fluxos
+- Tabelas
+  - `sectors` (unicidade por `tenant_id` + `name`)
+  - `flow_definitions` (`tenant_id`, `key`, `version`, `frozen`, `published_at`)
+  - `flow_states` (chaves únicas por fluxo, `initial`, `terminal`)
+  - `flow_transitions` (referenciam estados do mesmo fluxo)
+  - `flow_logs` (auditoria:
+    - `publish` gera log com `details={ key, version }`)
+- Endpoints
+  - GET `/api/sectors` — lista setores
+  - POST `/api/sectors` — cria setor (`tenant_id` default `default`)
+  - GET `/api/flows` — lista definições (por `tenant_id` query param, default `default`)
+  - POST `/api/flows` — cria nova versão de um fluxo (valida 1+ inicial e 1+ terminal; transições referem estados válidos)
+  - POST `/api/flows/{id}/publish` — publica e congela a versão (não pode publicar novamente)
+- Versionamento e publicação
+  - `POST /flows` sempre cria nova versão (`version = max + 1` por `tenant_id,key`).
+  - Publicar congela (`frozen=true`) e define `published_at`; cria entrada em `flow_logs`.
