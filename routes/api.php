@@ -6,6 +6,7 @@ use App\Http\Controllers\ItemController;
 use Illuminate\Support\Facades\Gate;
 use App\Http\Controllers\SectorController;
 use App\Http\Controllers\FlowController;
+use App\Http\Controllers\CustomerController;
 use App\Http\Middleware\DeviceSessionEnforcer;
 use App\Http\Middleware\EnforcePasswordPolicy;
 use App\Http\Middleware\RequestIdMiddleware;
@@ -54,4 +55,8 @@ Route::middleware([RequestIdMiddleware::class])->group(function () {
     Route::post('/flows', [FlowController::class, 'store']);
     Route::post('/flows/{id}/design', [FlowController::class, 'design']);
     Route::post('/flows/{id}/publish', [FlowController::class, 'publish']);
+
+    // Customers
+    Route::get('/customers', [CustomerController::class, 'index']);
+    Route::post('/customers', [CustomerController::class, 'store']);
 });

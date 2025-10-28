@@ -118,6 +118,22 @@ Este documento descreve a arquitetura, padrões e requisitos de operação do Fa
   - Nodes: `novo (initial)`, `teste (initial)`, `financeiro`, `suporte (terminal)`
   - Edges: `novo→financeiro (always)`, `financeiro→suporte (attribute_equals setor=financeiro)`, `teste→suporte (tag_in ['qa','lab'])`
 
+## Clientes (Customer)
+- Domínio e Tabelas
+  - `customers` (tenant_id, external_id?, name, email, phone, status, funnel_stage, meta)
+  - `customer_contacts` (type, value, preferred, meta)
+  - `addresses` (type, line1, city, ...)
+  - `customer_tags` (tag)
+  - `customer_history` (action, before, after, user_id, origin, timestamps)
+  - `customer_statuses` (parametrização por tenant; seeds em `CustomerStatusSeeder`)
+- API
+  - GET `/api/customers` (filtros: `tenant_id?`, `status?`, `tag?`, `funnel?`; paginação cursor com `per_page`)
+  - POST `/api/customers` (cria cliente + relacionamentos; audita em `customer_history` com before/after, who/when/origem)
+- Critérios e validações
+  - `status` deve existir em `customer_statuses` para o tenant
+  - Auditoria inclui `user_id` (se autenticado), `origin` (campo ou `X-Origin`/`User-Agent`), `request_id` no contexto de log
+  - Filtros cobertos por testes (status, tag, funil)
+
 ## Setores e Fluxos
 - Tabelas
   - `sectors` (unicidade por `tenant_id` + `name`)

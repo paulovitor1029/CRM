@@ -94,6 +94,15 @@ Depois rode: `php artisan pest:install` (se aplicável) e `composer dump-autoloa
       ```
   - POST `/api/flows/{id}/publish` — publica e congela a versão atual (cria auditoria em `flow_logs`).
 
+## Clientes (Customer)
+- Seeds de status: `php artisan db:seed --class=CustomerStatusSeeder`
+- Criar cliente:
+  - POST `/api/customers`
+  - Payload mínimo: `{ "name": "ACME", "status": "ativo" }`
+  - Relacionados opcionais: `contacts[]`, `addresses[]`, `tags[]`
+- Listar com filtros e cursor:
+  - GET `/api/customers?status=ativo&tag=vip&funnel=lead&per_page=10`
+
 ## Troubleshooting
 - Se `vendor/` não existir, execute `make composer-install`.
 - Se a aplicação não responder, verifique logs: `make logs`.
