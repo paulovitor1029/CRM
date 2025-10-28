@@ -52,5 +52,6 @@ Route::middleware([RequestIdMiddleware::class])->group(function () {
     // Flows
     Route::get('/flows', [FlowController::class, 'index']);
     Route::post('/flows', [FlowController::class, 'store']);
+    Route::post('/flows/{id}/design', [FlowController::class, 'design']);
     Route::post('/flows/{id}/publish', [FlowController::class, 'publish']);
 });

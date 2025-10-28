@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\FlowStoreRequest;
+use App\Http\Requests\FlowDesignRequest;
 use App\Models\FlowDefinition;
 use App\Services\FlowService;
 use Illuminate\Http\JsonResponse;
@@ -35,6 +36,17 @@ class FlowController
         return response()->json(['data' => $flow], Response::HTTP_CREATED);
     }
 
+    public function design(string $id, FlowDesignRequest $request): JsonResponse
+    {
+        $flow = FlowDefinition::findOrFail($id);
+        if ($flow->frozen) {
+            return response()->json(['message' => 'Flow is frozen'], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+        $graph = $request->validated();
+        $flow = $this->flows->saveDesign($flow, $graph);
+        return response()->json(['data' => $flow]);
+    }
+
     public function publish(string $id, Request $request): JsonResponse
     {
         $flow = FlowDefinition::with(['states', 'transitions'])->findOrFail($id);
@@ -43,4 +55,3 @@ class FlowController
         return response()->json(['data' => $flow]);
     }
 }
-

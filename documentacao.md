@@ -99,6 +99,25 @@ Este documento descreve a arquitetura, padrões e requisitos de operação do Fa
   - `POST /flows` sempre cria nova versão (`version = max + 1` por `tenant_id,key`).
   - Publicar congela (`frozen=true`) e define `published_at`; cria entrada em `flow_logs`.
 
+## Editor Visual de Fluxos (Contrato)
+- DTO (JSON) esperado em `/api/flows/{id}/design`:
+  - `nodes: [{ key, name, initial?, terminal? }]`
+  - `edges: [{ key, from, to, conditions?: [{ type: 'always' | 'attribute_equals' | 'tag_in', params? }], trigger?: { type: 'manual' | 'event', name? } }]`
+- Regras de validação
+  - Pelo menos 1 estado inicial e 1 terminal
+  - Todos os estados devem ser alcançáveis a partir de algum inicial
+  - Transições devem referenciar nodes existentes
+  - Condições somente dos tipos citados; parâmetros obrigatórios:
+    - `attribute_equals`: `params = { attribute, value }`
+    - `tag_in`: `params = { tags: string[] }`
+    - `always`: sem parâmetros
+  - Triggers suportados: `manual` ou `event` (quando `event`, requer `name`)
+- Publicação
+  - `POST /api/flows/{id}/publish` valida o grafo salvo e reconstrói `flow_states` e `flow_transitions`, congela a versão e audita em `flow_logs`.
+- Exemplo (Novo→Financeiro→Suporte, Teste→Suporte)
+  - Nodes: `novo (initial)`, `teste (initial)`, `financeiro`, `suporte (terminal)`
+  - Edges: `novo→financeiro (always)`, `financeiro→suporte (attribute_equals setor=financeiro)`, `teste→suporte (tag_in ['qa','lab'])`
+
 ## Setores e Fluxos
 - Tabelas
   - `sectors` (unicidade por `tenant_id` + `name`)
