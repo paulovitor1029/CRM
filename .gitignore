@@ -1,0 +1,21 @@
+# Environment
+.env.secrets
+.env.local
+
+# Dependencies and caches
+vendor/
+node_modules/
+.phpunit.result.cache
+.php-cs-fixer.cache
+.php-cs-fixer.dist.php
+.php-cs-fixer.php
+coverage/
+.coverage/
+.idea/
+.vscode/
+.DS_Store
+
+# Docker
+db-data/
+redis-data/
+

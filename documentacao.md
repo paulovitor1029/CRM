@@ -1,0 +1,84 @@
+# Documentação do Sistema
+
+Este documento descreve a arquitetura, padrões e requisitos de operação do FastHub (Laravel 11 + PostgreSQL + Redis).
+
+## Visão Geral
+- Framework: Laravel 11 (PHP 8.3)
+- Banco: PostgreSQL 15 (UTC, UUIDs por padrão)
+- Cache/Queue/Rate-limit: Redis 7
+- Infra: Docker (php-fpm, nginx, postgres, redis)
+- Testes: Pest com cobertura
+- Qualidade: PSR-12 (Pint), PHPStan (Larastan)
+- Estrutura modular: `modules/<Context>/{Domain,App,Infra}`
+
+## Observabilidade
+- Logs em JSON (Monolog) via `ObservabilityServiceProvider` e/ou `config/logging.php` com tap.
+- Cada linha de log é um JSON contendo nível, mensagem, contexto e timestamp ISO-8601.
+
+## PostgreSQL
+- Timezone forçada para UTC em cada conexão (`PostgresServiceProvider`).
+- Macros de Blueprint: `uuidPrimary()` e `timestampsTzUtc()`.
+- Função UUID configurável por `PG_UUID_FUNCTION` (default: `gen_random_uuid()`).
+
+## Rate limiting / Cache
+- Redis como store padrão (`config/cache.php`).
+- `RedisServiceProvider` registra rate-limit do grupo `api` (60 req/min por usuário/IP).
+
+## Estrutura Modular
+- `modules/Example/Domain`: entidades, value objects, regras de negócio.
+- `modules/Example/App`: casos de uso, DTOs, portas.
+- `modules/Example/Infra`: repositórios, HTTP, CLI, providers específicos, mapeamentos.
+- Ajustar `composer.json` para `"Modules\\": "modules/"`.
+
+## CI/CD
+- Workflow: lint → tests → build → migrations (`.github/workflows/ci.yml`).
+- Cobertura publicada como artefato (`coverage/`).
+
+## Operação
+- Subir stack: `make up`.
+- Migrações: `make migrate`. Seeds: `make seed`.
+- Testes: `make test` / `make coverage`.
+- Lint: `make lint`.
+
+Este arquivo deve ser mantido atualizado conforme novas decisões/implementações.
+
+## Autenticação
+- Sessões em Redis (`SESSION_DRIVER=redis`).
+- Endpoints:
+  - POST `/api/auth/login` (email, password[, device_id|X-Device-Id])
+    - 200 OK: autenticado; 202 Accepted: 2FA requerido; 401 inválido.
+  - POST `/api/auth/2fa/verify` (code ou recovery_code)
+    - 200 OK: autenticado; 401 inválido; 400 sem desafio.
+  - POST `/api/auth/logout` (auth obrigatório)
+    - 204 No Content.
+  - POST `/api/auth/refresh` (auth obrigatório)
+    - 200 OK e rotação de sessão (mitiga fixation).
+- 2FA TOTP: segredo Base32 em `user_security.two_factor_secret`.
+- Recovery codes: array JSON em `user_security.two_factor_recovery_codes` (marcação `used_at`).
+- Throttle: `throttle:api` aplicado nas rotas.
+- Device/session binding: middleware `DeviceSessionEnforcer` valida `X-Device-Id` com `session('device_id')`.
+- Política de senha: middleware `EnforcePasswordPolicy` (mín. 12, maiúscula, minúscula, número, símbolo) no login.
+- Logs de segurança (JSON): eventos `login_failed`, `2fa_challenge_started`, `2fa_verify_failed`, `login_success`, `login_success_2fa`, `logout`, `session_refreshed` com `request_id` de `RequestIdMiddleware`.
+
+## Esquema de autenticação (migr.)
+- `users`: uuid PK, email único, senha, controle de expiração e login.
+- `user_security`: 1:1 `users`, 2FA (enabled, secret, recovery_codes, last_2fa_at, tentativa falhas).
+- `failed_logins`: auditoria de falhas com ip/user_agent/motivo.
+
+## Autorização (RBAC/ABAC)
+- Tabelas:
+  - `roles`, `permissions`, `role_permission`, `user_role` para RBAC.
+  - `user_attributes` (JSON/JSONB) para atributos: `setor`, `turno`, `tags`.
+- Provider central: `AuthorizationServiceProvider` (Gate::before)
+  - Admin tem acesso total.
+  - Qualquer ability no Gate é tratado como permissão; atributos podem ser passados como 2º argumento.
+- Serviço: `AuthorizationService`
+  - Cache de permissões por sessão (`auth.permissions`).
+  - `can($user, $permission, $attributes=[])` com checagens de atributos.
+- Helpers
+  - Usar nativos do Laravel: `can()`, `Gate::allows()`, `Gate::authorize()`.
+  - Middleware: `can:<permission>` em rotas.
+- Seeds básicos: `database/seeders/RbacSeeder.php:1` (admin, gestor_setor, agente, financeiro, suporte) e permissões de exemplo (`items.*`, `reports.view`).
+- Rotas de exemplo protegidas:
+  - CRUD `/api/items` com `can:items.*`.
+  - `/api/reports/sector/{setor}` exige `reports.view` + ABAC `setor` via `Gate::authorize('reports.view', ['setor'=>...])`.

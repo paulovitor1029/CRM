@@ -1,0 +1,19 @@
+includes:
+    - vendor/nunomaduro/larastan/extension.neon
+
+parameters:
+    level: max
+    paths:
+        - app
+        - modules
+        - domain
+        - infra
+    tmpDir: ./storage/phpstan
+    checkGenericClassInNonGenericObjectType: false
+    checkMissingIterableValueType: false
+    ignoreErrors:
+        - '#Call to an undefined method Illuminate\\Support\\Collection::.+#'
+        - '#Access to an undefined property mixed#'
+    bootstrapFiles:
+        - vendor/autoload.php
+
