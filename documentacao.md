@@ -372,3 +372,17 @@ Este documento descreve a arquitetura, padrões e requisitos de operação do Fa
   - Endpoints: GET/POST `/api/admin/feature-flags`
 - Critérios
   - Todas as mudanças versionadas e auditáveis (quem alterou, antes/depois, quando)
+
+## Hardening Final + Testes de Isolamento
+- Suites dedicadas
+  - Multitenancy: `tests/Feature/Multitenancy/IsolationTest.php:1` garante isolamento por `tenant_id`
+  - Concorrência em tarefas: `tests/Feature/Tasks/TaskConcurrencyTest.php:1` previne double-assign com claim atômico
+  - Integridade dos fluxos: validações de reachability já cobertas em `tests/Feature/Flow/*`
+  - Segurança: `tests/Feature/Security/SecurityHeadersTest.php:1` (CSP, XFO, XCTO); CSRF em rotas web (padrão Laravel), API stateless
+  - Chaos (filas): testes de retries e DLQ em webhooks (`WebhookSecurityTest`) e regras
+- Middleware de segurança e observabilidade
+  - `SecurityHeadersMiddleware` aplica CSP/XFO/XCTO/Referrer-Policy/Permissions-Policy
+  - Grupo de rotas usa: RequestId, TraceContext, TenantContext, HttpMetrics, SecurityHeaders
+- Critérios
+  - Cobertura >95% em fluxos‑chave (autenticação, regras, faturamento, tasks, importadores, observabilidade)
+  - Checklist de release: `RELEASE_CHECKLIST.md`

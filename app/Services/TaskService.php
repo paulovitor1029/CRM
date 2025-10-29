@@ -81,6 +81,11 @@ class TaskService
             }
 
             $before = $task->only(['assignee_id','status']);
+            // Atomic claim on pending to prevent race
+            $claimed = Pending::where('task_id', $task->id)->whereNull('assigned_to')->update(['assigned_to' => $userId]);
+            if ($claimed === 0 && Pending::where('task_id', $task->id)->whereNotNull('assigned_to')->exists()) {
+                throw \Illuminate\Validation\ValidationException::withMessages(['task' => 'Task already claimed by another user']);
+            }
             $task->assignee_id = $userId;
             if ($task->first_response_at === null) {
                 $task->first_response_at = now();
@@ -89,13 +94,6 @@ class TaskService
                 $task->status = 'in_progress';
             }
             $task->save();
-
-            // Claim pending
-            $pending = Pending::where('task_id', $task->id)->first();
-            if ($pending) {
-                $pending->assigned_to = $userId;
-                $pending->save();
-            }
 
             TaskHistory::create([
                 'task_id' => $task->id,

@@ -35,8 +35,9 @@ use App\Http\Middleware\RequestIdMiddleware;
 use App\Http\Middleware\TenantContextMiddleware;
 use App\Http\Middleware\TraceContextMiddleware;
 use App\Http\Middleware\HttpMetricsMiddleware;
+use App\Http\Middleware\SecurityHeadersMiddleware;
 
-Route::middleware([RequestIdMiddleware::class, TraceContextMiddleware::class, TenantContextMiddleware::class, HttpMetricsMiddleware::class])->group(function () {
+Route::middleware([RequestIdMiddleware::class, TraceContextMiddleware::class, TenantContextMiddleware::class, HttpMetricsMiddleware::class, SecurityHeadersMiddleware::class])->group(function () {
     Route::post('/auth/login', [AuthController::class, 'login'])
         ->middleware(['throttle:api', EnforcePasswordPolicy::class])
         ->name('auth.login');
