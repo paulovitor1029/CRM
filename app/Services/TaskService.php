@@ -3,6 +3,9 @@
 namespace App\Services;
 
 use App\Models\Pending;
+use App\Events\TaskAssigned;
+use App\Events\TaskCompleted;
+use App\Events\TaskCreated;
 use App\Models\SlaPolicy;
 use App\Models\Task;
 use App\Models\TaskHistory;
@@ -62,6 +65,7 @@ class TaskService
             ]);
 
             Log::info('task_created', ['task_id' => $task->id, 'tenant_id' => $tenant, 'user_id' => $userId]);
+            event(new TaskCreated($task->id, $tenant, $task->sector_id, $task->title));
             return $task->load(['labels']);
         });
     }
@@ -103,6 +107,7 @@ class TaskService
             ]);
 
             Log::info('task_assigned', ['task_id' => $task->id, 'user_id' => $userId]);
+            event(new TaskAssigned($task->id, $task->tenant_id, $userId));
             return $task;
         });
     }
@@ -135,8 +140,8 @@ class TaskService
             ]);
 
             Log::info('task_completed', ['task_id' => $task->id, 'user_id' => $userId]);
+            event(new TaskCompleted($task->id, $task->tenant_id, $task->assignee_id));
             return $task;
         });
     }
 }
-

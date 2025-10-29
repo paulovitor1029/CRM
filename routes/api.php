@@ -12,6 +12,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PlanController;
 use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Middleware\DeviceSessionEnforcer;
 use App\Http\Middleware\EnforcePasswordPolicy;
 use App\Http\Middleware\RequestIdMiddleware;
@@ -81,4 +82,9 @@ Route::middleware([RequestIdMiddleware::class])->group(function () {
     Route::post('/tasks/{id}/complete', [TaskController::class, 'complete']);
     Route::get('/tasks/kanban', [TaskController::class, 'kanban']);
     Route::get('/tasks/my-agenda', [TaskController::class, 'myAgenda']);
+
+    // Notifications
+    Route::get('/notifications', [NotificationController::class, 'index']);
+    Route::post('/notifications/{id}/read', [NotificationController::class, 'markRead']);
+    Route::post('/notifications/subscription', [NotificationController::class, 'saveSubscription']);
 });

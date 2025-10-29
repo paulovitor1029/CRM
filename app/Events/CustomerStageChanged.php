@@ -2,14 +2,13 @@
 
 namespace App\Events;
 
-use App\Models\Customer;
-use App\Models\Pipeline;
-use App\Models\PipelineStage;
 use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PrivateChannel;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class CustomerStageChanged
+class CustomerStageChanged implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -21,7 +20,21 @@ class CustomerStageChanged
         public readonly ?string $justification,
         public readonly ?string $userId,
         public readonly ?string $origin,
+        public readonly ?string $tenantId = 'default',
     ) {
     }
-}
 
+    public function broadcastOn(): array
+    {
+        $channels = [new PrivateChannel('tenant.'.$this->tenantId)];
+        if ($this->userId) {
+            $channels[] = new PrivateChannel('users.'.$this->userId);
+        }
+        return $channels;
+    }
+
+    public function broadcastAs(): string
+    {
+        return 'customer.stage.changed';
+    }
+}

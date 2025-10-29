@@ -62,6 +62,7 @@ class PipelineService
                 $justification,
                 $userId,
                 $origin,
+                $pipeline->tenant_id,
             ));
 
             Log::info('customer_stage_changed', [
@@ -77,4 +78,3 @@ class PipelineService
         });
     }
 }
-

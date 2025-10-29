@@ -132,6 +132,16 @@ Depois rode: `php artisan pest:install` (se aplicável) e `composer dump-autoloa
   - GET `/api/tasks/kanban?sector_id=<id>` (visão por setor)
   - GET `/api/tasks/my-agenda` (tarefas do usuário)
 
+## Notificações e Tempo Real
+- Broadcasting
+  - Configure `BROADCAST_DRIVER` conforme sua infra (ex.: `log`, `pusher`, `redis`).
+  - Canais privados definidos em `routes/channels.php` (`tenant.{tenantId}`, `users.{userId}`).
+- Web Push
+  - Front registra subscription via POST `/api/notifications/subscription` com `{ endpoint, keys:{p256dh,auth}, ... }`.
+  - Service Worker manipula push e exibe notificações; backend guarda histórico em `notifications`.
+- Central de Notificações
+  - GET `/api/notifications` para feed recente; POST `/api/notifications/{id}/read` para marcar como lida.
+
 ## Troubleshooting
 - Se `vendor/` não existir, execute `make composer-install`.
 - Se a aplicação não responder, verifique logs: `make logs`.

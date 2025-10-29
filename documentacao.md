@@ -178,3 +178,24 @@ Este documento descreve a arquitetura, padrões e requisitos de operação do Fa
   - GET `/api/tasks/kanban?sector_id=<id>` → contrato: `{ columns: { open[], in_progress[], on_hold[], blocked[], done[], canceled[] } }`
   - GET `/api/tasks/my-agenda` → tarefas abertas do usuário autenticado
 - Auditoria: `task_history` com `create`, `assign`, `complete` (before/after, user_id, origin, timestamps)
+
+## Notificações Push + Broadcasting (Tempo Real)
+- Tabelas
+  - `notifications` (tenant_id, user_id?, type, title, body, data{}, channel, read_at, delivered_at)
+  - `user_notification_prefs` (por usuário: `preferences{ quiet_hours, enabled_types[], channels[] }`, `push_subscriptions[]`)
+  - `notification_templates` (por tenant: `key`, `title`, `body`)
+- Eventos (disparo e broadcast)
+  - `task.created`, `task.assigned`, `task.completed` (broadcast privado para `tenant.{tenantId}` e/ou `users.{userId}`)
+  - `customer.stage.changed` (mudança de etapa em pipeline)
+  - SLA próximo/menção: preparar evento para evolução (scheduler/worker)
+- Broadcasting
+  - Canais: `tenant.{tenantId}` (privado), `users.{userId}` (privado). Definições em `routes/channels.php`.
+  - Front pode usar Laravel Echo/WebSocket; SSE opcional conforme driver.
+- Web Push (contrato)
+  - Endpoint: POST `/api/notifications/subscription` com `{ endpoint, keys:{ p256dh, auth }, browser?, platform? }`
+  - Service Worker: deve receber payload `{ title, body, data }` e exibir push; fallback: notificação in-app (toast)
+- API da Central
+  - GET `/api/notifications` (feed do usuário + do tenant)
+  - POST `/api/notifications/{id}/read` (marca como lida)
+- Horários de silêncio (quiet hours)
+  - Configurados em `user_notification_prefs.preferences.quiet_hours` (start, end, timezone). Backend sempre grava in-app; push pode ser suprimido pelo front conforme prefs.
