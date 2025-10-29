@@ -165,3 +165,16 @@ Este documento descreve a arquitetura, padrões e requisitos de operação do Fa
 - Versionamento e publicação
   - `POST /flows` sempre cria nova versão (`version = max + 1` por `tenant_id,key`).
   - Publicar congela (`frozen=true`) e define `published_at`; cria entrada em `flow_logs`.
+## Pendências e Tarefas
+- Tabelas: `sla_policies`, `tasks`, `pendings`, `task_comments`, `task_checklist_items`, `task_labels` (+ pivot), `task_history`.
+- SLA: `response_due_at` e `resolution_due_at` calculados de `sla_policy` (por tenant).
+- Limite por usuário: `TASKS_MAX_OPEN` (config `tasks.max_open_assignments`).
+- Dependências: `depends_on_task_id` impede concluir antes da dependência.
+- Recorrência: estrutura JSON em `tasks.recurrence` para evolução.
+- Endpoints:
+  - GET/POST `/api/tasks`
+  - POST `/api/tasks/{id}/assign`
+  - POST `/api/tasks/{id}/complete`
+  - GET `/api/tasks/kanban?sector_id=<id>` → contrato: `{ columns: { open[], in_progress[], on_hold[], blocked[], done[], canceled[] } }`
+  - GET `/api/tasks/my-agenda` → tarefas abertas do usuário autenticado
+- Auditoria: `task_history` com `create`, `assign`, `complete` (before/after, user_id, origin, timestamps)

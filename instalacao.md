@@ -122,6 +122,16 @@ Depois rode: `php artisan pest:install` (se aplicável) e `composer dump-autoloa
   - GET `/api/subscriptions` | POST `/api/subscriptions`
   - Campos: `customer_id`, `plan_id?`, `items[]` (tipos: plan|addon|product), `starts_at?`, `trial_ends_at?`, `pro_rata?`, `courtesy_until?`, `limits{}`
 
+## Pendências e Tarefas
+- Seeds (opcional): `php artisan db:seed --class=SlaPolicySeeder`
+- Configurar limite por usuário: `.env` → `TASKS_MAX_OPEN=5`
+- Endpoints principais:
+  - GET/POST `/api/tasks`
+  - POST `/api/tasks/{id}/assign` (aplica limite por usuário)
+  - POST `/api/tasks/{id}/complete` (verifica dependências)
+  - GET `/api/tasks/kanban?sector_id=<id>` (visão por setor)
+  - GET `/api/tasks/my-agenda` (tarefas do usuário)
+
 ## Troubleshooting
 - Se `vendor/` não existir, execute `make composer-install`.
 - Se a aplicação não responder, verifique logs: `make logs`.

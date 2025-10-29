@@ -11,6 +11,7 @@ use App\Http\Controllers\CustomerPipelineController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PlanController;
 use App\Http\Controllers\SubscriptionController;
+use App\Http\Controllers\TaskController;
 use App\Http\Middleware\DeviceSessionEnforcer;
 use App\Http\Middleware\EnforcePasswordPolicy;
 use App\Http\Middleware\RequestIdMiddleware;
@@ -72,4 +73,12 @@ Route::middleware([RequestIdMiddleware::class])->group(function () {
     Route::post('/plans', [PlanController::class, 'store']);
     Route::get('/subscriptions', [SubscriptionController::class, 'index']);
     Route::post('/subscriptions', [SubscriptionController::class, 'store']);
+
+    // Tasks
+    Route::get('/tasks', [TaskController::class, 'index']);
+    Route::post('/tasks', [TaskController::class, 'store']);
+    Route::post('/tasks/{id}/assign', [TaskController::class, 'assign']);
+    Route::post('/tasks/{id}/complete', [TaskController::class, 'complete']);
+    Route::get('/tasks/kanban', [TaskController::class, 'kanban']);
+    Route::get('/tasks/my-agenda', [TaskController::class, 'myAgenda']);
 });
