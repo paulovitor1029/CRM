@@ -26,6 +26,7 @@ use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PrivacyController;
 use App\Http\Controllers\MetricsController;
+use App\Http\Controllers\ImportController;
 use App\Http\Middleware\DeviceSessionEnforcer;
 use App\Http\Middleware\EnforcePasswordPolicy;
 use App\Http\Middleware\RequestIdMiddleware;
@@ -142,6 +143,16 @@ Route::middleware([RequestIdMiddleware::class])->group(function () {
     Route::post('/privacy/consents/revoke', [PrivacyController::class, 'revokeConsent']);
     Route::get('/privacy/access-report', [PrivacyController::class, 'accessReport']);
     Route::post('/privacy/anonymize', [PrivacyController::class, 'anonymize']);
+
+    // Imports (CSV/XLSX)
+    Route::get('/imports', [ImportController::class, 'index']);
+    Route::post('/imports/upload', [ImportController::class, 'upload']);
+    Route::post('/imports/{id}/map', [ImportController::class, 'map']);
+    Route::get('/imports/{id}/preview', [ImportController::class, 'preview']);
+    Route::post('/imports/{id}/validate', [ImportController::class, 'validateAll']);
+    Route::post('/imports/{id}/start', [ImportController::class, 'start']);
+    Route::get('/imports/{id}', [ImportController::class, 'show']);
+    Route::get('/imports/{id}/errors', [ImportController::class, 'errors']);
 });
 
 // OAuth2 (Client Credentials)

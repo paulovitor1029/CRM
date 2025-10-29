@@ -193,6 +193,16 @@ Depois rode: `php artisan pest:install` (se aplicável) e `composer dump-autoloa
 - Métricas Prometheus em `/api/metrics` (expor no Prometheus server)
 - Dashboards: arquivo `observability/dashboards/grafana-golden-signals.json`
 
+## Importadores (CSV/XLSX)
+- Fluxo: upload → map → preview → validate → start
+- Endpoints
+  - POST `/api/imports/upload` (aceita `file` ou `file_key`, `entity_type`)
+  - POST `/api/imports/{id}/map` (ex.: `{ mapping: { name: "Nome", email: "E-mail" } }`)
+  - GET `/api/imports/{id}/preview`
+  - POST `/api/imports/{id}/validate`
+  - POST `/api/imports/{id}/start`
+- Erros: GET `/api/imports/{id}/errors` (amostra + `error_report_key` para CSV completo)
+
 ## Troubleshooting
 - Se `vendor/` não existir, execute `make composer-install`.
 - Se a aplicação não responder, verifique logs: `make logs`.

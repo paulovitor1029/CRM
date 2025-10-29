@@ -335,3 +335,23 @@ Este documento descreve a arquitetura, padrões e requisitos de operação do Fa
   - `observability/dashboards/grafana-golden-signals.json` com painéis de tráfego, latência (p95), erros, jobs e tasks overdue
 - Critérios
   - Golden signals instrumentados (latência, tráfego, erros, saturação) e testáveis via `/api/metrics`
+
+## Importadores (CSV/XLSX) com Preview e Validação
+- Pipeline
+  - Upload (`/api/imports/upload`) → Mapeamento (`/api/imports/{id}/map`) → Pré‑visualização (`/api/imports/{id}/preview`) → Validação (`/api/imports/{id}/validate`) → Import (`/api/imports/{id}/start`)
+- Suporte
+  - Entidades: `customers`, `products`, `contacts`
+  - Mapeamento de colunas: headers do CSV para campos do domínio (ex.: `name`, `email`, `phone`, `status`, `sku`, `price_cents`)
+- Validação
+  - Pré‑visualização retorna amostra com erros por linha
+  - Validação de arquivo: conta `total/valid/invalid`, grava até 200 erros em `import_job_errors` e gera CSV de erros (`error_report_key`)
+- Importação
+  - Jobs assíncronos: `ImportValidateJob`, `ImportOrchestratorJob`, `ImportProcessChunkJob` (chunks de 2.000 linhas; escalável 100k+)
+  - Rollback transacional por linha/chunk (MVP: transação por linha na camada de persistência)
+  - Reprocessamento: reencaminhar `/start` após correções/mapeamento
+- Tabelas
+  - `import_jobs` (status: uploaded|mapped|validating|validated|processing|completed|failed; counts, mapping, file_key)
+  - `import_job_errors` (amostra de erros com `row_number`, `errors[]`, `row_data{}`)
+- Critérios
+  - Suporta CSV nativamente; XLSX pode ser adicionado com biblioteca compatível
+  - Relatórios de erro e trilha auditável (status, tempos, contagens)
