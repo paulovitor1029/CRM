@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Gate;
 use App\Http\Controllers\SectorController;
 use App\Http\Controllers\FlowController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\CustomerPipelineController;
 use App\Http\Middleware\DeviceSessionEnforcer;
 use App\Http\Middleware\EnforcePasswordPolicy;
 use App\Http\Middleware\RequestIdMiddleware;
@@ -59,4 +60,5 @@ Route::middleware([RequestIdMiddleware::class])->group(function () {
     // Customers
     Route::get('/customers', [CustomerController::class, 'index']);
     Route::post('/customers', [CustomerController::class, 'store']);
+    Route::post('/customers/{id}/transition', [CustomerPipelineController::class, 'transition']);
 });

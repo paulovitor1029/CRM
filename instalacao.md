@@ -103,6 +103,14 @@ Depois rode: `php artisan pest:install` (se aplicável) e `composer dump-autoloa
 - Listar com filtros e cursor:
   - GET `/api/customers?status=ativo&tag=vip&funnel=lead&per_page=10`
 
+## Pipelines/Funis (Clientes)
+- Estrutura
+  - `pipelines`, `pipeline_stages`, `customer_pipeline_state`, `pipeline_transition_logs`
+- Transicionar estágio
+  - POST `/api/customers/{id}/transition`
+  - Body: `{ "pipeline_key": "vendas", "to_stage": "qualificado", "justification": "verificado" }`
+  - Emite evento `CustomerStageChanged` e grava log
+
 ## Troubleshooting
 - Se `vendor/` não existir, execute `make composer-install`.
 - Se a aplicação não responder, verifique logs: `make logs`.

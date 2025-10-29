@@ -134,6 +134,20 @@ Este documento descreve a arquitetura, padrões e requisitos de operação do Fa
   - Auditoria inclui `user_id` (se autenticado), `origin` (campo ou `X-Origin`/`User-Agent`), `request_id` no contexto de log
   - Filtros cobertos por testes (status, tag, funil)
 
+## Pipelines/Funis e Transições de Cliente
+- Tabelas
+  - `pipelines` (por tenant; `key` ex.: vendas, implantacao, suporte)
+  - `pipeline_stages` (estágios com `initial`, `terminal`, `position`)
+  - `customer_pipeline_state` (estado atual por cliente+pipeline)
+  - `pipeline_transition_logs` (from→to, justification, user_id, origin, timestamps)
+- Endpoint
+  - POST `/api/customers/{id}/transition` — body: `{ pipeline_key, to_stage, justification?, origin? }`
+- Regras
+  - Transição manual permitida (motor de regras: placeholder para evolução)
+  - Logs de transição gravados e evento emitido
+- Eventos
+  - `App\Events\CustomerStageChanged` com dados do antes/depois; pronto para integrações/notificações
+
 ## Setores e Fluxos
 - Tabelas
   - `sectors` (unicidade por `tenant_id` + `name`)
