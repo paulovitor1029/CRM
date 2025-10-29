@@ -301,3 +301,18 @@ Este documento descreve a arquitetura, padrões e requisitos de operação do Fa
 - Critérios
   - Cálculo conferível (tests cobrem emissão, cortesia e disparo de pagamento aprovado)
   - Auditoria em `invoice_logs`
+
+## LGPD & Segurança (Auditoria, Consentimento, DPO)
+- Tabelas
+  - `privacy_consents` (subject_type/id, purpose, version, given_at, revoked_at, ip, user_agent, metadata)
+  - `access_logs` (trilha imutável: subject, actor, action, resource, fields, ip, user_agent, occurred_at)
+  - `data_retention_policies` (por entidade: retention_days, action [anonymize|delete], conditions?, active)
+- Endpoints
+  - POST `/api/privacy/consents` e POST `/api/privacy/consents/revoke`
+  - GET `/api/privacy/access-report?subject_type=&subject_id=` (paginado)
+  - POST `/api/privacy/anonymize` com `{ subject_type: user|customer, subject_id }`
+- Políticas de Export/Delete (direito ao esquecimento)
+  - MVP: `anonymize` implementado (pseudonimização removendo PII principal); export pode usar endpoints existentes (ex.: `customers` + `documents`) ou evoluir com exportador dedicado
+- Critérios
+  - Access logs gravados como append‑only na aplicação e consultáveis por titular
+  - Consents versionados, com IP e user‑agent registrados

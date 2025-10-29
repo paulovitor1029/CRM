@@ -24,6 +24,7 @@ use App\Http\Controllers\WebhookController;
 use App\Http\Middleware\ClientCredentialsMiddleware;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\PrivacyController;
 use App\Http\Middleware\DeviceSessionEnforcer;
 use App\Http\Middleware\EnforcePasswordPolicy;
 use App\Http\Middleware\RequestIdMiddleware;
@@ -130,6 +131,12 @@ Route::middleware([RequestIdMiddleware::class])->group(function () {
     Route::get('/invoices', [InvoiceController::class, 'index']);
     Route::post('/invoices', [InvoiceController::class, 'store']);
     Route::post('/payments', [PaymentController::class, 'store']);
+
+    // Privacy & LGPD
+    Route::post('/privacy/consents', [PrivacyController::class, 'consents']);
+    Route::post('/privacy/consents/revoke', [PrivacyController::class, 'revokeConsent']);
+    Route::get('/privacy/access-report', [PrivacyController::class, 'accessReport']);
+    Route::post('/privacy/anonymize', [PrivacyController::class, 'anonymize']);
 });
 
 // OAuth2 (Client Credentials)

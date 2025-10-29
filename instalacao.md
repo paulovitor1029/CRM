@@ -182,6 +182,12 @@ Depois rode: `php artisan pest:install` (se aplicável) e `composer dump-autoloa
   - POST `/api/payments` com `{ invoice_id, status (pending|paid|failed), amount_cents, currency?, method?, external_id? }`
   - Ao marcar como paid, evento `PaymentApproved` é emitido (integra com motor de regras)
 
+## LGPD & Segurança
+- Consents: POST `/api/privacy/consents` e `/api/privacy/consents/revoke`
+- Relatório de acesso por titular: GET `/api/privacy/access-report?subject_type=user|customer&subject_id=<id>`
+- Anonimização/pseudonimização: POST `/api/privacy/anonymize` (suporte para `user` e `customer`)
+- Políticas de retenção: tabela `data_retention_policies` (configurável por tenant)
+
 ## Troubleshooting
 - Se `vendor/` não existir, execute `make composer-install`.
 - Se a aplicação não responder, verifique logs: `make logs`.
