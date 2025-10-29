@@ -9,6 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany as BelongsToManyRel;
 
 class User extends Authenticatable
 {
@@ -43,5 +44,15 @@ class User extends Authenticatable
     public function hasRole(string $name): bool
     {
         return $this->roles()->where('name', $name)->exists();
+    }
+
+    public function organizations(): BelongsToManyRel
+    {
+        return $this->belongsToMany(Organization::class, 'organization_user')->withPivot(['role','permissions','invited_at','accepted_at'])->withTimestamps();
+    }
+
+    public function isSuperAdmin(): bool
+    {
+        return $this->hasRole('superadmin');
     }
 }

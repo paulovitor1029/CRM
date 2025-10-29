@@ -13,9 +13,9 @@ class NotificationController
     public function index(Request $request): JsonResponse
     {
         $user = $request->user();
-        $tenant = (string) ($request->query('tenant_id') ?? 'default');
+        $tenant = (string) ($request->attributes->get('organization_id') ?? $request->query('organization_id') ?? 'default');
         $list = Notification::query()
-            ->where('tenant_id', $tenant)
+            ->where('organization_id', $tenant)
             ->where(function ($q) use ($user) {
                 $q->whereNull('user_id');
                 if ($user) { $q->orWhere('user_id', $user->id); }
@@ -53,4 +53,3 @@ class NotificationController
         return response()->json(['message' => 'Subscription saved'], Response::HTTP_CREATED);
     }
 }
-

@@ -14,13 +14,13 @@ class TaskCompleted implements ShouldBroadcast
 
     public function __construct(
         public readonly string $taskId,
-        public readonly string $tenantId,
+        public readonly string $organizationId,
         public readonly ?string $assigneeId,
     ) {}
 
     public function broadcastOn(): array
     {
-        $channels = [new PrivateChannel('tenant.'.$this->tenantId)];
+        $channels = [new PrivateChannel('organization.'.$this->organizationId)];
         if ($this->assigneeId) { $channels[] = new PrivateChannel('users.'.$this->assigneeId); }
         return $channels;
     }
@@ -30,4 +30,3 @@ class TaskCompleted implements ShouldBroadcast
         return 'task.completed';
     }
 }
-

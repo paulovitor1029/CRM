@@ -10,7 +10,7 @@ class DataRetentionPolicy extends Model
 {
     use HasFactory, HasUuids;
 
-    protected $fillable = ['tenant_id','entity','retention_days','action','conditions','active'];
+    protected $fillable = ['organization_id','entity','retention_days','action','conditions','active'];
 
     protected $casts = [
         'retention_days' => 'int',
@@ -18,4 +18,3 @@ class DataRetentionPolicy extends Model
         'active' => 'boolean',
     ];
 }
-

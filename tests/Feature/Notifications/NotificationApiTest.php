@@ -21,9 +21,8 @@ it('stores notification record on task assignment', function () {
     $u = User::factory()->create();
     event(new \App\Events\TaskAssigned('task-id-1', 'default', (string) $u->id));
     $this->assertDatabaseHas('notifications', [
-        'tenant_id' => 'default',
+        'organization_id' => 'default',
         'user_id' => $u->id,
         'type' => 'task.assigned',
     ]);
 });
-

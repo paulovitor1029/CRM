@@ -4,7 +4,6 @@ namespace App\Listeners;
 
 use App\Events\CustomerCreated;
 use App\Events\CustomerStageChanged;
-use App\Events\PaymentApproved;
 use App\Events\TaskAssigned;
 use App\Events\TaskCompleted;
 use App\Events\TaskCreated;
@@ -14,10 +13,10 @@ class OutboxEventRecorder
 {
     public function handle($event): void
     {
-        [$key, $payload, $tenant] = $this->map($event);
+        [$key, $payload, $org] = $this->map($event);
         if (!$key) return;
         OutboxEvent::create([
-            'tenant_id' => $tenant ?? 'default',
+            'organization_id' => $org ?? 'default',
             'event_key' => $key,
             'payload' => $payload,
             'status' => 'pending',
@@ -28,17 +27,15 @@ class OutboxEventRecorder
     {
         switch (true) {
             case $event instanceof TaskCreated:
-                return ['task.created', ['task_id' => $event->taskId, 'title' => $event->title], $event->tenantId];
+                return ['task.created', ['task_id' => $event->taskId, 'title' => $event->title], $event->organizationId];
             case $event instanceof TaskAssigned:
-                return ['task.assigned', ['task_id' => $event->taskId, 'assignee_id' => $event->assigneeId], $event->tenantId];
+                return ['task.assigned', ['task_id' => $event->taskId, 'assignee_id' => $event->assigneeId], $event->organizationId];
             case $event instanceof TaskCompleted:
-                return ['task.completed', ['task_id' => $event->taskId], $event->tenantId];
+                return ['task.completed', ['task_id' => $event->taskId], $event->organizationId];
             case $event instanceof CustomerStageChanged:
-                return ['customer.stage.changed', ['customer_id' => $event->customerId, 'to_stage_id' => $event->toStageId, 'pipeline_id' => $event->pipelineId], $event->tenantId];
+                return ['customer.stage.changed', ['customer_id' => $event->customerId, 'to_stage_id' => $event->toStageId, 'pipeline_id' => $event->pipelineId], $event->organizationId];
             case $event instanceof CustomerCreated:
-                return ['customer.created', ['customer_id' => $event->customerId], $event->tenantId];
-            case $event instanceof PaymentApproved:
-                return ['payment.approved', ['payment_id' => $event->paymentId, 'customer_id' => $event->customerId, 'amount_cents' => $event->amountCents], $event->tenantId];
+                return ['customer.created', ['customer_id' => $event->customerId], $event->organizationId];
             default:
                 return [null, [], null];
         }

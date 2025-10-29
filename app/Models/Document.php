@@ -13,7 +13,7 @@ class Document extends Model
     use HasFactory, HasUuids;
 
     protected $fillable = [
-        'tenant_id', 'title', 'content', 'owner_id', 'sector_id', 'current_version', 'autosave_at', 'meta'
+        'organization_id', 'title', 'content', 'owner_id', 'sector_id', 'current_version', 'autosave_at', 'meta'
     ];
 
     protected $casts = [
@@ -32,4 +32,3 @@ class Document extends Model
         return $this->hasMany(DocumentShare::class);
     }
 }
-

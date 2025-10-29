@@ -10,7 +10,7 @@ class SlaPolicy extends Model
     use HasFactory;
 
     protected $fillable = [
-        'tenant_id', 'key', 'name', 'target_response_minutes', 'target_resolution_minutes', 'working_hours', 'active'
+        'organization_id', 'key', 'name', 'target_response_minutes', 'target_resolution_minutes', 'working_hours', 'active'
     ];
 
     protected $casts = [
@@ -20,4 +20,3 @@ class SlaPolicy extends Model
         'active' => 'boolean',
     ];
 }
-

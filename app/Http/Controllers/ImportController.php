@@ -21,8 +21,8 @@ class ImportController
 
     public function index(Request $request): JsonResponse
     {
-        $tenant = (string) ($request->query('tenant_id') ?? 'default');
-        $list = ImportJob::where('tenant_id', $tenant)->orderByDesc('created_at')->paginate(20);
+        $tenant = (string) ($request->attributes->get('organization_id') ?? $request->query('organization_id') ?? 'default');
+        $list = ImportJob::where('organization_id', $tenant)->orderByDesc('created_at')->paginate(20);
         return response()->json(['data' => $list->items(), 'meta' => ['current_page' => $list->currentPage()]]);
     }
 
@@ -45,7 +45,7 @@ class ImportController
             Storage::disk($disk)->put($key, file_get_contents($file->getRealPath()), ['visibility' => 'private']);
         }
         $job = ImportJob::create([
-            'tenant_id' => (string) ($request->query('tenant_id') ?? 'default'),
+            'organization_id' => (string) ($request->attributes->get('organization_id') ?? $request->query('organization_id') ?? 'default'),
             'entity_type' => $data['entity_type'],
             'file_key' => $key,
             'original_filename' => $original,
@@ -106,4 +106,3 @@ class ImportController
         return response()->json(['data' => $job]);
     }
 }
-

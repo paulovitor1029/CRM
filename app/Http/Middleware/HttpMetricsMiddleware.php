@@ -17,7 +17,7 @@ class HttpMetricsMiddleware
         $method = strtolower($request->getMethod());
         $status = $response->getStatusCode();
         $route = $request->route()?->uri() ?? $request->path();
-        $tenant = (string) ($request->attributes->get('tenant_id') ?? 'default');
+        $tenant = (string) ($request->attributes->get('organization_id') ?? 'default');
 
         Metrics::incCounter('http_requests_total', compact('method','route','status','tenant'));
         Metrics::observeHistogram('http_request_duration_seconds', compact('method','route','status','tenant'), $duration, [0.05,0.1,0.25,0.5,1,2,5]);
@@ -29,4 +29,3 @@ class HttpMetricsMiddleware
         return $response;
     }
 }
-

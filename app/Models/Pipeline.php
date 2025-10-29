@@ -12,7 +12,7 @@ class Pipeline extends Model
     use HasFactory, HasUuids;
 
     protected $fillable = [
-        'tenant_id', 'key', 'type', 'name', 'description', 'active',
+        'organization_id', 'key', 'type', 'name', 'description', 'active',
     ];
 
     protected $casts = [
@@ -29,4 +29,3 @@ class Pipeline extends Model
         return $this->hasMany(CustomerPipelineState::class);
     }
 }
-

@@ -11,7 +11,7 @@ class TaskStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'tenant_id' => ['nullable', 'string', 'max:64'],
+            'organization_id' => ['nullable', 'string', 'max:64'],
             'sector_id' => ['nullable', 'uuid', 'exists:sectors,id'],
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
@@ -25,4 +25,3 @@ class TaskStoreRequest extends FormRequest
         ];
     }
 }
-

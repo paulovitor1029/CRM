@@ -16,8 +16,6 @@ class RefreshMaterializedViews implements ShouldQueue
     public function handle(): void
     {
         $views = [
-            'mrr_por_mes',
-            'churn_por_mes',
             'aging_pendencias',
             'produtividade_setor',
             'conversoes_funil',
@@ -27,4 +25,3 @@ class RefreshMaterializedViews implements ShouldQueue
         }
     }
 }
-

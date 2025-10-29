@@ -13,7 +13,7 @@ it('creates a customer with contacts, addresses, tags and writes history', funct
     $this->actingAs(User::factory()->create(['password' => Hash::make('Str0ngP@ssw0rd!')]));
 
     $payload = [
-        'tenant_id' => 'default',
+        'organization_id' => 'default',
         'name' => 'ACME Ltd',
         'email' => 'info@acme.test',
         'phone' => '+55 11 99999-0000',
@@ -43,12 +43,15 @@ it('filters customers by status, tag and funnel with cursor pagination', functio
 
     // create 3 customers
     $c1 = $this->postJson('/api/customers', [
+        'organization_id' => 'default',
         'name' => 'A', 'status' => 'ativo', 'tags' => ['vip'], 'funnel_stage' => 'lead'
     ])->assertCreated()->json('data.id');
     $c2 = $this->postJson('/api/customers', [
+        'organization_id' => 'default',
         'name' => 'B', 'status' => 'teste', 'tags' => ['trial'], 'funnel_stage' => 'trial'
     ])->assertCreated()->json('data.id');
     $c3 = $this->postJson('/api/customers', [
+        'organization_id' => 'default',
         'name' => 'C', 'status' => 'ativo', 'tags' => ['vip','trial'], 'funnel_stage' => 'lead'
     ])->assertCreated()->json('data.id');
 
@@ -64,4 +67,3 @@ it('filters customers by status, tag and funnel with cursor pagination', functio
     $this->getJson('/api/customers?funnel=lead&per_page=1')->assertOk()
         ->assertJson(fn ($json) => $json->has('next_cursor'));
 });
-

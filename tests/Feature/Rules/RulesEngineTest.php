@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Hash;
 
 it('creates rule and processes outbox for task.assigned -> notification', function () {
     // Create rule
-    $rule = RuleDefinition::create(['tenant_id' => 'default', 'name' => 'Notify assignee', 'event_key' => 'task.assigned', 'conditions' => [], 'enabled' => true]);
+    $rule = RuleDefinition::create(['organization_id' => 'default', 'name' => 'Notify assignee', 'event_key' => 'task.assigned', 'conditions' => [], 'enabled' => true]);
     RuleAction::create(['rule_id' => $rule->id, 'type' => 'send_notification', 'position' => 0, 'params' => []]);
 
     // Dispatch event -> goes to outbox via listener
@@ -22,4 +22,3 @@ it('creates rule and processes outbox for task.assigned -> notification', functi
     // For brevity, assert that outbox and notifications exist eventually.
     $this->assertDatabaseHas('notifications', [ 'user_id' => $u->id, 'type' => 'rule.notification' ]);
 });
-

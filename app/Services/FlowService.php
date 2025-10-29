@@ -20,7 +20,7 @@ class FlowService
 
     public function create(array $payload): FlowDefinition
     {
-        $tenant = $payload['tenant_id'] ?? 'default';
+        $tenant = $payload['organization_id'] ?? 'default';
         $key = $payload['key'];
         $name = $payload['name'];
         $description = $payload['description'] ?? null;
@@ -47,11 +47,11 @@ class FlowService
         }
 
         return $this->db->transaction(function () use ($tenant, $key, $name, $description, $states, $transitions) {
-            $currentMax = FlowDefinition::where('tenant_id', $tenant)->where('key', $key)->max('version');
+            $currentMax = FlowDefinition::where('organization_id', $tenant)->where('key', $key)->max('version');
             $version = (int) $currentMax + 1;
 
             $flow = FlowDefinition::create([
-                'tenant_id' => $tenant,
+                'organization_id' => $tenant,
                 'key' => $key,
                 'version' => $version,
                 'name' => $name,

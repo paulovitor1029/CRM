@@ -10,7 +10,6 @@ class TenantConfig extends Model
 {
     use HasFactory, HasUuids;
 
-    protected $fillable = ['tenant_id','scope','version','data','updated_by'];
+    protected $fillable = ['organization_id','scope','version','data','updated_by'];
     protected $casts = ['data' => 'array'];
 }
-

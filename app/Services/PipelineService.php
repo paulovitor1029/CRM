@@ -20,8 +20,8 @@ class PipelineService
 
     public function transition(Customer $customer, string $pipelineKey, string $toStageKey, ?string $justification = null, ?string $userId = null, ?string $origin = null): CustomerPipelineState
     {
-        $tenant = $customer->tenant_id;
-        $pipeline = Pipeline::where('tenant_id', $tenant)->where('key', $pipelineKey)->first();
+        $tenant = $customer->organization_id;
+        $pipeline = Pipeline::where('organization_id', $tenant)->where('key', $pipelineKey)->first();
         if (!$pipeline) {
             throw ValidationException::withMessages(['pipeline_key' => 'Pipeline not found for tenant']);
         }
@@ -62,7 +62,7 @@ class PipelineService
                 $justification,
                 $userId,
                 $origin,
-                $pipeline->tenant_id,
+                $pipeline->organization_id,
             ));
 
             Log::info('customer_stage_changed', [

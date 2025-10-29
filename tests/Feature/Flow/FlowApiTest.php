@@ -1,27 +1,27 @@
-<?php
+﻿<?php
 
 use App\Models\User;
 use App\Models\FlowDefinition;
 use Illuminate\Support\Facades\Hash;
 
-it('creates sector with uniqueness by tenant', function () {
+it('creates sector with uniqueness by organization', function () {
     $this->actingAs(User::factory()->create(['password' => Hash::make('Str0ngP@ssw0rd!')]));
 
     $this->postJson('/api/sectors', [
-        'tenant_id' => 't1',
-        'name' => 'Saúde',
+        'organization_id' => 't1',
+        'name' => 'SaÃºde',
     ])->assertCreated();
 
     // Same tenant + name should fail
     $this->postJson('/api/sectors', [
-        'tenant_id' => 't1',
-        'name' => 'Saúde',
+        'organization_id' => 't1',
+        'name' => 'SaÃºde',
     ])->assertStatus(500); // unique constraint -> 500 from DB in this minimal stub
 
     // Different tenant ok
     $this->postJson('/api/sectors', [
-        'tenant_id' => 't2',
-        'name' => 'Saúde',
+        'organization_id' => 't2',
+        'name' => 'SaÃºde',
     ])->assertCreated();
 });
 
@@ -30,7 +30,7 @@ it('validates flow states and transitions', function () {
 
     // Missing terminal
     $payload = [
-        'tenant_id' => 'default',
+        'organization_id' => 'default',
         'key' => 'onboarding',
         'name' => 'Onboarding',
         'states' => [
@@ -53,7 +53,7 @@ it('publishes a flow, freezes version, and logs audit', function () {
     $this->actingAs(User::factory()->create());
 
     $create = $this->postJson('/api/flows', [
-        'tenant_id' => 'default',
+        'organization_id' => 'default',
         'key' => 'approval',
         'name' => 'Approval',
         'states' => [
@@ -73,3 +73,4 @@ it('publishes a flow, freezes version, and logs audit', function () {
     // Second publish should 422
     $this->postJson("/api/flows/{$id}/publish")->assertUnprocessable();
 });
+

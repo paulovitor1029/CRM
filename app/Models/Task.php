@@ -14,7 +14,7 @@ class Task extends Model
     use HasFactory, HasUuids;
 
     protected $fillable = [
-        'tenant_id', 'sector_id', 'title', 'description', 'status', 'priority', 'due_at',
+        'organization_id', 'sector_id', 'title', 'description', 'status', 'priority', 'due_at',
         'created_by', 'assignee_id', 'sla_policy_id', 'response_due_at', 'resolution_due_at',
         'first_response_at', 'completed_at', 'recurrence', 'depends_on_task_id'
     ];
@@ -63,4 +63,3 @@ class Task extends Model
         return $this->hasMany(TaskHistory::class);
     }
 }
-

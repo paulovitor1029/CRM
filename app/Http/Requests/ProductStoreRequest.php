@@ -14,7 +14,7 @@ class ProductStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'tenant_id' => ['nullable', 'string', 'max:64'],
+            'organization_id' => ['nullable', 'string', 'max:64'],
             'category_id' => ['nullable', 'integer', 'exists:product_categories,id'],
             'name' => ['required', 'string', 'max:255'],
             'sku' => ['required', 'string', 'max:64'],
@@ -25,4 +25,3 @@ class ProductStoreRequest extends FormRequest
         ];
     }
 }
-

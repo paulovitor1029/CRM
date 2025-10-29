@@ -17,10 +17,10 @@ class PrivacyService
     {
     }
 
-    public function logAccess(string $tenantId, string $subjectType, string $subjectId, string $action, array $context = []): void
+    public function logAccess(string $organizationId, string $subjectType, string $subjectId, string $action, array $context = []): void
     {
         AccessLog::create([
-            'tenant_id' => $tenantId,
+            'organization_id' => $organizationId,
             'subject_type' => $subjectType,
             'subject_id' => $subjectId,
             'actor_type' => $context['actor_type'] ?? 'system',
@@ -56,4 +56,3 @@ class PrivacyService
         });
     }
 }
-

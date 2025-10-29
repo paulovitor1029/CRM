@@ -12,7 +12,6 @@ class CustomerCreated
 
     public function __construct(
         public readonly string $customerId,
-        public readonly string $tenantId = 'default',
+        public readonly string $organizationId = 'default',
     ) {}
 }
-

@@ -11,7 +11,7 @@ class WebhookEndpoint extends Model
 {
     use HasFactory, HasUuids;
 
-    protected $fillable = ['tenant_id','event_key','url','secret','headers','active'];
+    protected $fillable = ['organization_id','event_key','url','secret','headers','active'];
 
     protected $casts = [
         'headers' => 'array',
@@ -23,4 +23,3 @@ class WebhookEndpoint extends Model
         return $this->hasMany(WebhookDelivery::class, 'endpoint_id');
     }
 }
-

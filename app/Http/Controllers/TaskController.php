@@ -20,8 +20,8 @@ class TaskController
 
     public function index(Request $request): JsonResponse
     {
-        $tenant = (string) ($request->query('tenant_id') ?? 'default');
-        $query = Task::query()->where('tenant_id', $tenant);
+        $org = (string) ($request->attributes->get('organization_id') ?? $request->query('organization_id') ?? 'default');
+        $query = Task::query()->where('organization_id', $org);
         if ($sector = $request->query('sector_id')) {
             $query->where('sector_id', $sector);
         }
@@ -38,7 +38,7 @@ class TaskController
     public function store(TaskStoreRequest $request): JsonResponse
     {
         $payload = $request->validated();
-        $payload['tenant_id'] = $payload['tenant_id'] ?? 'default';
+        $payload['organization_id'] = $payload['organization_id'] ?? (string) ($request->attributes->get('organization_id') ?? $request->query('organization_id') ?? 'default');
         $origin = $request->header('X-Origin') ?? $request->userAgent();
         $userId = optional($request->user())->id;
         $task = $this->tasks->create($payload, $userId, $origin);
@@ -65,9 +65,9 @@ class TaskController
 
     public function kanban(Request $request): JsonResponse
     {
-        $tenant = (string) ($request->query('tenant_id') ?? 'default');
+        $tenant = (string) ($request->attributes->get('organization_id') ?? $request->query('organization_id') ?? 'default');
         $sector = (string) ($request->query('sector_id') ?? '');
-        $query = Task::query()->where('tenant_id', $tenant);
+        $query = Task::query()->where('organization_id', $tenant);
         if ($sector !== '') { $query->where('sector_id', $sector); }
         $rows = $query->get(['id','title','status','priority','assignee_id','due_at']);
         $columns = [];
@@ -87,12 +87,11 @@ class TaskController
     public function myAgenda(Request $request): JsonResponse
     {
         $userId = optional($request->user())->id;
-        $tenant = (string) ($request->query('tenant_id') ?? 'default');
-        $tasks = Task::where('tenant_id', $tenant)->where('assignee_id', $userId)
+        $tenant = (string) ($request->attributes->get('organization_id') ?? $request->query('organization_id') ?? 'default');
+        $tasks = Task::where('organization_id', $tenant)->where('assignee_id', $userId)
             ->whereIn('status', ['open','in_progress','on_hold','blocked'])
             ->orderByRaw('CASE WHEN due_at IS NULL THEN 1 ELSE 0 END, due_at ASC')
             ->get(['id','title','status','priority','due_at']);
         return response()->json(['data' => $tasks]);
     }
 }
-

@@ -18,15 +18,15 @@ class FileController
 
     public function index(Request $request): JsonResponse
     {
-        $tenant = (string) ($request->query('tenant_id') ?? 'default');
-        $list = FileObject::where('tenant_id', $tenant)->orderByDesc('created_at')->limit(50)->get();
+        $tenant = (string) ($request->attributes->get('organization_id') ?? $request->query('organization_id') ?? 'default');
+        $list = FileObject::where('organization_id', $tenant)->orderByDesc('created_at')->limit(50)->get();
         return response()->json(['data' => $list]);
     }
 
     public function presign(FilePresignRequest $request): JsonResponse
     {
         $data = $request->validated();
-        $tenant = (string) ($data['tenant_id'] ?? 'default');
+        $tenant = (string) ($data['organization_id'] ?? $request->attributes->get('organization_id') ?? $request->query('organization_id') ?? 'default');
         $userId = optional($request->user())->id;
         $res = $this->files->presign($tenant, $userId, $data['key'], $data['content_type'] ?? null, $data['size'] ?? null, $data['checksum'] ?? null, $data['meta'] ?? []);
         return response()->json([
@@ -58,4 +58,3 @@ class FileController
         return response()->json(['message' => 'Uploaded']);
     }
 }
-

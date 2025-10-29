@@ -12,20 +12,20 @@ class SectorController
 {
     public function index(): JsonResponse
     {
-        $sectors = Sector::query()->orderBy('name')->get(['id', 'tenant_id', 'name', 'description']);
+        $org = (string) ($request->attributes->get('organization_id') ?? $request->query('organization_id') ?? 'default');
+        $sectors = Sector::query()->where('organization_id', $org)->orderBy('name')->get(['id', 'organization_id', 'name', 'description']);
         return response()->json(['data' => $sectors]);
     }
 
     public function store(SectorStoreRequest $request): JsonResponse
     {
         $data = $request->validated();
-        $data['tenant_id'] = $data['tenant_id'] ?? 'default';
+        $data['organization_id'] = $data['organization_id'] ?? (string) ($request->attributes->get('organization_id') ?? $request->query('organization_id') ?? 'default');
         $sector = Sector::create($data);
         Log::info('sector_created', [
             'sector_id' => $sector->id,
-            'tenant_id' => $sector->tenant_id,
+            'organization_id' => $sector->organization_id,
         ]);
         return response()->json(['data' => $sector], Response::HTTP_CREATED);
     }
 }
-

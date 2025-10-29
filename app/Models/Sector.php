@@ -11,7 +11,6 @@ class Sector extends Model
     use HasFactory, HasUuids;
 
     protected $fillable = [
-        'tenant_id', 'name', 'description',
+        'organization_id', 'name', 'description',
     ];
 }
-

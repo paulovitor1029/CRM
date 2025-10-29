@@ -19,8 +19,8 @@ class CustomerController
 
     public function index(Request $request): JsonResponse
     {
-        $tenant = (string) ($request->query('tenant_id') ?? 'default');
-        $query = Customer::query()->where('tenant_id', $tenant);
+        $org = (string) ($request->attributes->get('organization_id') ?? $request->query('organization_id') ?? 'default');
+        $query = Customer::query()->where('organization_id', $org);
 
         if ($status = $request->query('status')) {
             $query->where('status', $status);
@@ -47,17 +47,16 @@ class CustomerController
     public function store(CustomerStoreRequest $request): JsonResponse
     {
         $payload = $request->validated();
-        $payload['tenant_id'] = $payload['tenant_id'] ?? 'default';
+        $payload['organization_id'] = $payload['organization_id'] ?? (string) ($request->attributes->get('organization_id') ?? $request->query('organization_id') ?? 'default');
         $origin = $payload['origin'] ?? $request->header('X-Origin') ?? $request->userAgent();
         $userId = optional($request->user())->id;
 
         $customer = $this->customers->create($payload, $userId, $origin);
         Log::info('customer_created_api', [
             'customer_id' => $customer->id,
-            'tenant_id' => $payload['tenant_id'],
+            'organization_id' => $payload['organization_id'],
         ]);
 
         return response()->json(['data' => $customer], Response::HTTP_CREATED);
     }
 }
-

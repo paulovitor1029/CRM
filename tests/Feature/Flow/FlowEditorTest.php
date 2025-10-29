@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Hash;
 function createBaseFlowId($test) {
     $test->actingAs(User::factory()->create(['password' => Hash::make('Str0ngP@ssw0rd!')]));
     $resp = $test->postJson('/api/flows', [
-        'tenant_id' => 'default',
+        'organization_id' => 'default',
         'key' => 'editor-flow',
         'name' => 'Editor Flow',
         'states' => [
@@ -74,4 +74,3 @@ it('rejects invalid condition type', function () {
     ];
     $this->postJson("/api/flows/{$id}/design", $graph)->assertUnprocessable();
 });
-

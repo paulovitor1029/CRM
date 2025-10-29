@@ -12,7 +12,7 @@ class FlowDefinition extends Model
     use HasFactory, HasUuids;
 
     protected $fillable = [
-        'tenant_id', 'key', 'version', 'name', 'description', 'published_at', 'frozen',
+        'organization_id', 'key', 'version', 'name', 'description', 'published_at', 'frozen',
     ];
 
     protected $casts = [
@@ -35,4 +35,3 @@ class FlowDefinition extends Model
         return $this->hasMany(FlowLog::class);
     }
 }
-

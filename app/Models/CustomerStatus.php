@@ -9,9 +9,8 @@ class CustomerStatus extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['tenant_id', 'name', 'label', 'is_active'];
+    protected $fillable = ['organization_id', 'name', 'label', 'is_active'];
     protected $casts = [
         'is_active' => 'boolean',
     ];
 }
-

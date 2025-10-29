@@ -12,7 +12,7 @@ class Product extends Model
     use HasFactory, HasUuids;
 
     protected $fillable = [
-        'tenant_id', 'category_id', 'name', 'sku', 'price_cents', 'currency', 'active',
+        'organization_id', 'category_id', 'name', 'sku', 'price_cents', 'currency', 'active',
     ];
 
     protected $casts = [
@@ -25,4 +25,3 @@ class Product extends Model
         return $this->belongsTo(ProductCategory::class, 'category_id');
     }
 }
-

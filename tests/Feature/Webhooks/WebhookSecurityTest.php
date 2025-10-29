@@ -7,8 +7,8 @@ use App\Models\WebhookEndpoint;
 use Illuminate\Support\Facades\Http;
 
 it('signs webhooks with HMAC and includes timestamp and idempotency key', function () {
-    $ep = WebhookEndpoint::create(['tenant_id' => 'default', 'event_key' => 'task.assigned', 'url' => 'https://example/webhook', 'secret' => 'shhh', 'active' => true]);
-    $evt = OutboxEvent::create(['tenant_id' => 'default', 'event_key' => 'task.assigned', 'payload' => ['task_id' => 'T1'], 'status' => 'pending']);
+    $ep = WebhookEndpoint::create(['organization_id' => 'default', 'event_key' => 'task.assigned', 'url' => 'https://example/webhook', 'secret' => 'shhh', 'active' => true]);
+    $evt = OutboxEvent::create(['organization_id' => 'default', 'event_key' => 'task.assigned', 'payload' => ['task_id' => 'T1'], 'status' => 'pending']);
     $d = WebhookDelivery::create([
         'endpoint_id' => $ep->id,
         'outbox_id' => $evt->id,
@@ -37,7 +37,7 @@ it('signs webhooks with HMAC and includes timestamp and idempotency key', functi
 });
 
 it('applies exponential backoff and DLQ upon failures', function () {
-    $ep = WebhookEndpoint::create(['tenant_id' => 'default', 'event_key' => 'x', 'url' => 'https://example/webhook', 'secret' => 's', 'active' => true]);
+    $ep = WebhookEndpoint::create(['organization_id' => 'default', 'event_key' => 'x', 'url' => 'https://example/webhook', 'secret' => 's', 'active' => true]);
     $d = WebhookDelivery::create(['endpoint_id' => $ep->id, 'event_key' => 'x', 'payload' => ['a'=>1], 'status' => 'pending', 'attempts' => 0]);
     Http::fake([ '*' => Http::response([], 500) ]);
     try { DispatchWebhook::dispatchSync($d->id); } catch (Throwable $e) {}
@@ -46,4 +46,3 @@ it('applies exponential backoff and DLQ upon failures', function () {
     expect($d->attempts)->toBe(1);
     expect($d->next_attempt_at)->not->toBeNull();
 });
-

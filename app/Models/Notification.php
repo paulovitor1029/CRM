@@ -11,7 +11,7 @@ class Notification extends Model
     use HasFactory, HasUuids;
 
     protected $fillable = [
-        'tenant_id', 'user_id', 'type', 'title', 'body', 'data', 'channel', 'read_at', 'delivered_at'
+        'organization_id', 'user_id', 'type', 'title', 'body', 'data', 'channel', 'read_at', 'delivered_at'
     ];
 
     protected $casts = [
@@ -20,4 +20,3 @@ class Notification extends Model
         'delivered_at' => 'datetime',
     ];
 }
-

@@ -11,7 +11,7 @@ class DocumentStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'tenant_id' => ['nullable', 'string', 'max:64'],
+            'organization_id' => ['nullable', 'string', 'max:64'],
             'title' => ['required', 'string', 'max:255'],
             'content' => ['nullable', 'string'],
             'sector_id' => ['nullable', 'uuid', 'exists:sectors,id'],
@@ -19,4 +19,3 @@ class DocumentStoreRequest extends FormRequest
         ];
     }
 }
-

@@ -12,7 +12,7 @@ class Customer extends Model
     use HasFactory, HasUuids;
 
     protected $fillable = [
-        'tenant_id', 'external_id', 'name', 'email', 'phone', 'status', 'funnel_stage', 'meta',
+        'organization_id', 'external_id', 'name', 'email', 'phone', 'status', 'funnel_stage', 'meta',
     ];
 
     protected $casts = [
@@ -39,4 +39,3 @@ class Customer extends Model
         return $this->hasMany(CustomerHistory::class);
     }
 }
-

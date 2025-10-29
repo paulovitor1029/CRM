@@ -14,9 +14,9 @@ class CustomerStoreRequest extends FormRequest
 
     public function rules(): array
     {
-        $tenant = (string) ($this->input('tenant_id') ?? 'default');
+        $tenant = (string) ($this->input('organization_id') ?? 'default');
         return [
-            'tenant_id' => ['nullable', 'string', 'max:64'],
+            'organization_id' => ['nullable', 'string', 'max:64'],
             'external_id' => ['nullable', 'string', 'max:128'],
             'name' => ['required', 'string', 'max:255'],
             'email' => ['nullable', 'email', 'max:255'],
@@ -24,7 +24,7 @@ class CustomerStoreRequest extends FormRequest
             'status' => [
                 'required', 'string', 'max:64',
                 Rule::exists('customer_statuses', 'name')->where(function ($q) use ($tenant) {
-                    $q->where('tenant_id', $tenant)->where('is_active', true);
+                    $q->where('organization_id', $tenant)->where('is_active', true);
                 }),
             ],
             'funnel_stage' => ['nullable', 'string', 'max:64'],
@@ -49,4 +49,3 @@ class CustomerStoreRequest extends FormRequest
         ];
     }
 }
-

@@ -27,7 +27,7 @@ class RulesController
             'actions.*.params' => ['nullable','array'],
         ]);
         $rule = RuleDefinition::create([
-            'tenant_id' => (string) ($request->query('tenant_id') ?? 'default'),
+            'organization_id' => (string) ($request->attributes->get('organization_id') ?? $request->query('organization_id') ?? 'default'),
             'name' => $data['name'],
             'event_key' => $data['event_key'],
             'conditions' => $data['conditions'] ?? [],
@@ -50,8 +50,8 @@ class RulesController
             'event_key' => ['required','string'],
             'payload' => ['required','array'],
         ]);
-        $tenant = (string) ($request->query('tenant_id') ?? 'default');
-        $rules = RuleDefinition::with('actions')->where('tenant_id',$tenant)->where('event_key',$data['event_key'])->where('enabled',true)->get();
+        $tenant = (string) ($request->attributes->get('organization_id') ?? $request->query('organization_id') ?? 'default');
+        $rules = RuleDefinition::with('actions')->where('organization_id',$tenant)->where('event_key',$data['event_key'])->where('enabled',true)->get();
         $results = [];
         foreach ($rules as $rule) {
             $results[] = [
@@ -71,7 +71,7 @@ class RulesController
             'payload' => ['required','array'],
         ]);
         $evt = OutboxEvent::create([
-            'tenant_id' => (string) ($request->query('tenant_id') ?? 'default'),
+            'organization_id' => (string) ($request->attributes->get('organization_id') ?? $request->query('organization_id') ?? 'default'),
             'event_key' => $data['event_key'],
             'payload' => $data['payload'],
             'status' => 'pending',
@@ -92,4 +92,3 @@ class RulesController
         return response()->json(['data' => $runs]);
     }
 }
-

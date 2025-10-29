@@ -19,7 +19,7 @@ class CustomerStatusSeeder extends Seeder
         ];
         foreach ($statuses as $s) {
             CustomerStatus::updateOrCreate([
-                'tenant_id' => $tenant,
+                'organization_id' => $tenant,
                 'name' => $s['name'],
             ], [
                 'label' => $s['label'],
@@ -28,4 +28,3 @@ class CustomerStatusSeeder extends Seeder
         }
     }
 }
-

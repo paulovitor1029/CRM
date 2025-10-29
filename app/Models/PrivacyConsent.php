@@ -10,7 +10,7 @@ class PrivacyConsent extends Model
 {
     use HasFactory, HasUuids;
 
-    protected $fillable = ['tenant_id','subject_type','subject_id','purpose','version','given_at','revoked_at','ip','user_agent','metadata'];
+    protected $fillable = ['organization_id','subject_type','subject_id','purpose','version','given_at','revoked_at','ip','user_agent','metadata'];
 
     protected $casts = [
         'given_at' => 'datetime',
@@ -18,4 +18,3 @@ class PrivacyConsent extends Model
         'metadata' => 'array',
     ];
 }
-

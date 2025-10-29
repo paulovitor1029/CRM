@@ -10,7 +10,7 @@ class TenantCustomField extends Model
 {
     use HasFactory, HasUuids;
 
-    protected $fillable = ['tenant_id','entity','name','key','type','required','visibility_roles','options','order','active','version','updated_by'];
+    protected $fillable = ['organization_id','entity','name','key','type','required','visibility_roles','options','order','active','version','updated_by'];
 
     protected $casts = [
         'visibility_roles' => 'array',
@@ -19,4 +19,3 @@ class TenantCustomField extends Model
         'active' => 'boolean',
     ];
 }
-

@@ -14,10 +14,9 @@ class SectorStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'tenant_id' => ['nullable', 'string', 'max:64'],
+            'organization_id' => ['nullable', 'string', 'max:64'],
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:255'],
         ];
     }
 }
-

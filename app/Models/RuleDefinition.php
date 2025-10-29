@@ -11,7 +11,7 @@ class RuleDefinition extends Model
 {
     use HasFactory, HasUuids;
 
-    protected $fillable = ['tenant_id','name','event_key','conditions','enabled'];
+    protected $fillable = ['organization_id','name','event_key','conditions','enabled'];
 
     protected $casts = [
         'conditions' => 'array',
@@ -23,4 +23,3 @@ class RuleDefinition extends Model
         return $this->hasMany(RuleAction::class, 'rule_id')->orderBy('position');
     }
 }
-

@@ -10,7 +10,7 @@ class SlaPolicySeeder extends Seeder
     public function run(): void
     {
         SlaPolicy::updateOrCreate([
-            'tenant_id' => 'default',
+            'organization_id' => 'default',
             'key' => 'default',
         ], [
             'name' => 'Default SLA',
@@ -20,4 +20,3 @@ class SlaPolicySeeder extends Seeder
         ]);
     }
 }
-

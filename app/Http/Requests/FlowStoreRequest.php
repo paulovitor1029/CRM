@@ -14,7 +14,7 @@ class FlowStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'tenant_id' => ['nullable', 'string', 'max:64'],
+            'organization_id' => ['nullable', 'string', 'max:64'],
             'key' => ['required', 'string', 'max:128'],
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
@@ -30,4 +30,3 @@ class FlowStoreRequest extends FormRequest
         ];
     }
 }
-

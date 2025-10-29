@@ -18,14 +18,14 @@ class PrivacyController
     public function consents(Request $request): JsonResponse
     {
         $data = $request->validate([
-            'tenant_id' => ['nullable','string','max:64'],
+            'organization_id' => ['nullable','string','max:64'],
             'subject_type' => ['required','string','max:64'],
             'subject_id' => ['required','string','max:64'],
             'purpose' => ['required','string','max:128'],
             'version' => ['nullable','string','max:64'],
         ]);
         $rec = PrivacyConsent::create([
-            'tenant_id' => $data['tenant_id'] ?? 'default',
+            'organization_id' => $data['organization_id'] ?? (string) ($request->attributes->get('organization_id') ?? $request->query('organization_id') ?? 'default'),
             'subject_type' => $data['subject_type'],
             'subject_id' => $data['subject_id'],
             'purpose' => $data['purpose'],
@@ -34,7 +34,7 @@ class PrivacyController
             'ip' => $request->ip(),
             'user_agent' => (string) $request->userAgent(),
         ]);
-        $this->privacy->logAccess($rec->tenant_id, $rec->subject_type, $rec->subject_id, 'consent', [
+        $this->privacy->logAccess($rec->organization_id, $rec->subject_type, $rec->subject_id, 'consent', [
             'resource' => 'privacy_consents', 'resource_id' => $rec->id, 'ip' => $request->ip(), 'user_agent' => (string) $request->userAgent(), 'actor_type' => 'user', 'actor_id' => optional($request->user())->id,
         ]);
         return response()->json(['data' => $rec], Response::HTTP_CREATED);
@@ -43,12 +43,12 @@ class PrivacyController
     public function revokeConsent(Request $request): JsonResponse
     {
         $data = $request->validate([
-            'tenant_id' => ['nullable','string','max:64'],
+            'organization_id' => ['nullable','string','max:64'],
             'subject_type' => ['required','string','max:64'],
             'subject_id' => ['required','string','max:64'],
             'purpose' => ['required','string','max:128'],
         ]);
-        $rec = PrivacyConsent::where('tenant_id', $data['tenant_id'] ?? 'default')
+        $rec = PrivacyConsent::where('organization_id', $data['organization_id'] ?? (string) ($request->attributes->get('organization_id') ?? $request->query('organization_id') ?? 'default'))
             ->where('subject_type', $data['subject_type'])
             ->where('subject_id', $data['subject_id'])
             ->where('purpose', $data['purpose'])
@@ -61,16 +61,16 @@ class PrivacyController
     public function accessReport(Request $request): JsonResponse
     {
         $data = $request->validate([
-            'tenant_id' => ['nullable','string','max:64'],
+            'organization_id' => ['nullable','string','max:64'],
             'subject_type' => ['required','string','max:64'],
             'subject_id' => ['required','string','max:64'],
         ]);
-        $tenant = $data['tenant_id'] ?? 'default';
-        $logs = AccessLog::where('tenant_id', $tenant)
+        $tenant = $data['organization_id'] ?? (string) ($request->attributes->get('organization_id') ?? $request->query('organization_id') ?? 'default');
+        $logs = AccessLog::where('organization_id', $tenant)
             ->where('subject_type', $data['subject_type'])
             ->where('subject_id', $data['subject_id'])
             ->orderByDesc('occurred_at')->paginate(50);
-        $consents = PrivacyConsent::where('tenant_id',$tenant)
+        $consents = PrivacyConsent::where('organization_id',$tenant)
             ->where('subject_type', $data['subject_type'])
             ->where('subject_id', $data['subject_id'])
             ->orderByDesc('given_at')->get();
@@ -84,8 +84,8 @@ class PrivacyController
             'subject_id' => ['required','string','max:64'],
         ]);
         $this->privacy->anonymize($data['subject_type'], $data['subject_id']);
-        $this->privacy->logAccess('default', $data['subject_type'], $data['subject_id'], 'anonymize', [ 'actor_type' => 'user', 'actor_id' => optional($request->user())->id ]);
+        $org = (string) ($request->attributes->get('organization_id') ?? $request->query('organization_id') ?? 'default');
+        $this->privacy->logAccess($org, $data['subject_type'], $data['subject_id'], 'anonymize', [ 'actor_type' => 'user', 'actor_id' => optional($request->user())->id ]);
         return response()->json(['message' => 'Anonymized']);
     }
 }
-

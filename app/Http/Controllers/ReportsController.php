@@ -14,15 +14,15 @@ class ReportsController
     public function export(Request $request): JsonResponse
     {
         $data = $request->validate([
-            'report_key' => ['required', 'string', 'in:mrr_por_mes,churn_por_mes,aging_pendencias,produtividade_setor,conversoes_funil'],
+            'report_key' => ['required', 'string', 'in:aging_pendencias,produtividade_setor,conversoes_funil'],
             'format' => ['required', 'string', 'in:csv,xlsx,pdf'],
             'params' => ['nullable', 'array'],
         ]);
-        $tenant = (string) ($request->query('tenant_id') ?? 'default');
+        $org = (string) ($request->attributes->get('organization_id') ?? $request->query('organization_id') ?? 'default');
         $id = (string) Str::uuid();
         ReportExport::create([
             'id' => $id,
-            'tenant_id' => $tenant,
+            'organization_id' => $org,
             'report_key' => $data['report_key'],
             'format' => $data['format'],
             'params' => $data['params'] ?? [],
@@ -42,4 +42,3 @@ class ReportsController
         return response()->json(['data' => $export]);
     }
 }
-

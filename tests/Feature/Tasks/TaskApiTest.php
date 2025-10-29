@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 use App\Models\Sector;
 use App\Models\Task;
@@ -8,14 +8,14 @@ use Illuminate\Support\Facades\Hash;
 
 beforeEach(function () {
     // default SLA
-    SlaPolicy::updateOrCreate(['tenant_id' => 'default', 'key' => 'default'], [
+    SlaPolicy::updateOrCreate(['organization_id' => 'default', 'key' => 'default'], [
         'name' => 'Default', 'target_response_minutes' => 60, 'target_resolution_minutes' => 240
     ]);
 });
 
 it('creates a task with SLA timers and appears in kanban', function () {
     $this->actingAs(User::factory()->create(['password' => Hash::make('Str0ngP@ssw0rd!')]));
-    $sector = \App\Models\Sector::create(['tenant_id' => 'default', 'name' => 'Suporte']);
+    $sector = \App\Models\Sector::create(['organization_id' => 'default', 'name' => 'Suporte']);
 
     $resp = $this->postJson('/api/tasks', [
         'title' => 'Atender chamado',
@@ -60,4 +60,5 @@ it('lists my agenda for assigned tasks', function () {
     $agenda = $this->getJson('/api/tasks/my-agenda')->assertOk();
     expect($agenda->json('data'))->toBeArray();
 });
+
 

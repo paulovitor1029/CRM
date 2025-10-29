@@ -20,13 +20,13 @@ class CustomerStageChanged implements ShouldBroadcast
         public readonly ?string $justification,
         public readonly ?string $userId,
         public readonly ?string $origin,
-        public readonly ?string $tenantId = 'default',
+        public readonly ?string $organizationId = 'default',
     ) {
     }
 
     public function broadcastOn(): array
     {
-        $channels = [new PrivateChannel('tenant.'.$this->tenantId)];
+        $channels = [new PrivateChannel('organization.'.$this->organizationId)];
         if ($this->userId) {
             $channels[] = new PrivateChannel('users.'.$this->userId);
         }

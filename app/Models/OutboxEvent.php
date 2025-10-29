@@ -12,7 +12,7 @@ class OutboxEvent extends Model
 
     protected $table = 'outbox';
 
-    protected $fillable = ['tenant_id','event_key','payload','occurred_at','status','attempts','last_error','processed_at'];
+    protected $fillable = ['organization_id','event_key','payload','occurred_at','status','attempts','last_error','processed_at'];
 
     protected $casts = [
         'payload' => 'array',
@@ -20,4 +20,3 @@ class OutboxEvent extends Model
         'processed_at' => 'datetime',
     ];
 }
-

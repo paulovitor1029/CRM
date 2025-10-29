@@ -13,7 +13,7 @@ class ReportExport extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'tenant_id', 'report_key', 'format', 'params', 'status', 'file_key', 'error', 'created_at', 'updated_at'
+        'organization_id', 'report_key', 'format', 'params', 'status', 'file_key', 'error', 'created_at', 'updated_at'
     ];
 
     protected $casts = [
@@ -22,4 +22,3 @@ class ReportExport extends Model
         'updated_at' => 'datetime',
     ];
 }
-

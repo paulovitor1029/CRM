@@ -14,9 +14,8 @@ class DashboardController
 
     public function widgets(Request $request): JsonResponse
     {
-        $tenant = (string) ($request->query('tenant_id') ?? 'default');
-        $data = $this->reporting->widgets($tenant, $request->all());
+        $org = (string) ($request->attributes->get('organization_id') ?? $request->query('organization_id') ?? 'default');
+        $data = $this->reporting->widgets($org, $request->all());
         return response()->json(['data' => $data]);
     }
 }
-

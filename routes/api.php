@@ -9,8 +9,6 @@ use App\Http\Controllers\FlowController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\CustomerPipelineController;
 use App\Http\Controllers\ProductController;
-use App\Http\Controllers\PlanController;
-use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\FileController;
@@ -21,23 +19,22 @@ use App\Http\Controllers\RulesController;
 use App\Http\Controllers\OAuthTokenController;
 use App\Http\Controllers\OAuthClientsController;
 use App\Http\Controllers\WebhookController;
-use App\Http\Middleware\ClientCredentialsMiddleware;
-use App\Http\Controllers\InvoiceController;
-use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PrivacyController;
 use App\Http\Controllers\MetricsController;
 use App\Http\Controllers\ImportController;
 use App\Http\Controllers\TenantAdminController;
+use App\Http\Controllers\OrganizationController;
+use App\Http\Middleware\ClientCredentialsMiddleware;
 use App\Http\Middleware\DeviceSessionEnforcer;
 use App\Http\Middleware\EnforcePasswordPolicy;
 use App\Http\Middleware\RequestIdMiddleware;
-
-use App\Http\Middleware\TenantContextMiddleware;
+use App\Http\Middleware\OrganizationContextMiddleware;
+use App\Http\Middleware\TenantToOrganizationAlias;
 use App\Http\Middleware\TraceContextMiddleware;
 use App\Http\Middleware\HttpMetricsMiddleware;
 use App\Http\Middleware\SecurityHeadersMiddleware;
 
-Route::middleware([RequestIdMiddleware::class, TraceContextMiddleware::class, TenantContextMiddleware::class, HttpMetricsMiddleware::class, SecurityHeadersMiddleware::class])->group(function () {
+Route::middleware([RequestIdMiddleware::class, TraceContextMiddleware::class, TenantToOrganizationAlias::class, OrganizationContextMiddleware::class, HttpMetricsMiddleware::class, SecurityHeadersMiddleware::class])->group(function () {
     Route::post('/auth/login', [AuthController::class, 'login'])
         ->middleware(['throttle:api', EnforcePasswordPolicy::class])
         ->name('auth.login');
@@ -70,8 +67,8 @@ Route::middleware([RequestIdMiddleware::class, 'auth'])->group(function () {
     })->middleware('can:reports.view');
 });
 
-// Sectors & Flows API
-Route::middleware([RequestIdMiddleware::class])->group(function () {
+// Organization-scoped APIs
+Route::middleware([RequestIdMiddleware::class, TenantToOrganizationAlias::class, OrganizationContextMiddleware::class])->group(function () {
     // Sectors
     Route::get('/sectors', [SectorController::class, 'index']);
     Route::post('/sectors', [SectorController::class, 'store']);
@@ -87,13 +84,9 @@ Route::middleware([RequestIdMiddleware::class])->group(function () {
     Route::post('/customers', [CustomerController::class, 'store']);
     Route::post('/customers/{id}/transition', [CustomerPipelineController::class, 'transition']);
 
-    // Catalog & Subscriptions
+    // Catalog (Products only)
     Route::get('/products', [ProductController::class, 'index']);
     Route::post('/products', [ProductController::class, 'store']);
-    Route::get('/plans', [PlanController::class, 'index']);
-    Route::post('/plans', [PlanController::class, 'store']);
-    Route::get('/subscriptions', [SubscriptionController::class, 'index']);
-    Route::post('/subscriptions', [SubscriptionController::class, 'store']);
 
     // Tasks
     Route::get('/tasks', [TaskController::class, 'index']);
@@ -135,10 +128,7 @@ Route::middleware([RequestIdMiddleware::class])->group(function () {
     Route::post('/rules/replay/{id}', [RulesController::class, 'replay']);
     Route::get('/rules/runs', [RulesController::class, 'runs']);
 
-    // Billing
-    Route::get('/invoices', [InvoiceController::class, 'index']);
-    Route::post('/invoices', [InvoiceController::class, 'store']);
-    Route::post('/payments', [PaymentController::class, 'store']);
+    // Billing removed
 
     // Privacy & LGPD
     Route::post('/privacy/consents', [PrivacyController::class, 'consents']);
@@ -165,6 +155,17 @@ Route::middleware([RequestIdMiddleware::class])->group(function () {
     Route::post('/admin/feature-flags', [TenantAdminController::class, 'setFlag']);
     Route::get('/admin/templates', [TenantAdminController::class, 'templates']);
     Route::post('/admin/templates', [TenantAdminController::class, 'upsertTemplate']);
+
+    // Organizations
+    Route::get('/organizations', [OrganizationController::class, 'index']);
+    Route::post('/organizations', [OrganizationController::class, 'store']);
+    Route::put('/organizations/{id}', [OrganizationController::class, 'update']);
+    Route::delete('/organizations/{id}', [OrganizationController::class, 'destroy']);
+    Route::get('/organizations/{id}/members', [OrganizationController::class, 'members']);
+    Route::post('/organizations/{id}/members', [OrganizationController::class, 'addMember']);
+    Route::post('/organizations/{id}/members/{userId}/role', [OrganizationController::class, 'setMemberRole']);
+    Route::get('/organizations/switch', [OrganizationController::class, 'switcher']);
+    Route::post('/organizations/{id}/switch', [OrganizationController::class, 'switch']);
 });
 
 // OAuth2 (Client Credentials)
@@ -185,3 +186,10 @@ Route::prefix('v1')->middleware([ClientCredentialsMiddleware::class])->group(fun
 
 // Prometheus metrics endpoint
 Route::get('/metrics', MetricsController::class);
+
+
+
+
+
+
+

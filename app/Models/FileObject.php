@@ -11,7 +11,7 @@ class FileObject extends Model
     use HasFactory, HasUuids;
 
     protected $fillable = [
-        'tenant_id', 'user_id', 'disk', 'key', 'size', 'content_type', 'checksum', 'uploaded_at', 'meta'
+        'organization_id', 'user_id', 'disk', 'key', 'size', 'content_type', 'checksum', 'uploaded_at', 'meta'
     ];
 
     protected $casts = [
@@ -20,4 +20,3 @@ class FileObject extends Model
         'meta' => 'array',
     ];
 }
-

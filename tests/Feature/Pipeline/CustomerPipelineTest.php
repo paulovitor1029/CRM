@@ -8,7 +8,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Event;
 
 function seedPipeline($tenant = 'default') {
-    $p = Pipeline::create(['tenant_id' => $tenant, 'key' => 'vendas', 'type' => 'vendas', 'name' => 'Vendas']);
+    $p = Pipeline::create(['organization_id' => $tenant, 'key' => 'vendas', 'type' => 'vendas', 'name' => 'Vendas']);
     PipelineStage::create(['pipeline_id' => $p->id, 'key' => 'novo', 'name' => 'Novo', 'position' => 1, 'initial' => true]);
     PipelineStage::create(['pipeline_id' => $p->id, 'key' => 'qualificado', 'name' => 'Qualificado', 'position' => 2]);
     return $p;
@@ -18,7 +18,7 @@ it('transitions customer through pipeline, logs and emits event', function () {
     $p = seedPipeline();
     $u = User::factory()->create();
     $this->actingAs($u);
-    $customer = Customer::create(['tenant_id' => 'default', 'name' => 'ACME', 'status' => 'ativo']);
+    $customer = Customer::create(['organization_id' => 'default', 'name' => 'ACME', 'status' => 'ativo']);
 
     Event::fake([CustomerStageChanged::class]);
 
@@ -40,4 +40,3 @@ it('transitions customer through pipeline, logs and emits event', function () {
 
     Event::assertDispatched(CustomerStageChanged::class, 2);
 });
-

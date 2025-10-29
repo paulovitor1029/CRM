@@ -12,7 +12,7 @@ class WebhookService
 {
     public function enqueueForOutbox(OutboxEvent $evt): void
     {
-        $endpoints = WebhookEndpoint::where('tenant_id', $evt->tenant_id)
+        $endpoints = WebhookEndpoint::where('organization_id', $evt->organization_id)
             ->where('event_key', $evt->event_key)
             ->where('active', true)
             ->get();
@@ -31,4 +31,3 @@ class WebhookService
         }
     }
 }
-

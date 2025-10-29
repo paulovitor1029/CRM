@@ -14,14 +14,14 @@ class TaskCreated implements ShouldBroadcast
 
     public function __construct(
         public readonly string $taskId,
-        public readonly string $tenantId,
+        public readonly string $organizationId,
         public readonly ?string $sectorId,
         public readonly string $title,
     ) {}
 
     public function broadcastOn(): array
     {
-        return [new PrivateChannel('tenant.'.$this->tenantId)];
+        return [new PrivateChannel('organization.'.$this->organizationId)];
     }
 
     public function broadcastAs(): string
@@ -29,4 +29,3 @@ class TaskCreated implements ShouldBroadcast
         return 'task.created';
     }
 }
-

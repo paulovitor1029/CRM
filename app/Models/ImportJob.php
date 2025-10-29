@@ -12,7 +12,7 @@ class ImportJob extends Model
     use HasFactory, HasUuids;
 
     protected $fillable = [
-        'tenant_id','entity_type','status','file_key','original_filename','mapping','total_rows','valid_rows','invalid_rows','error_report_key','created_by','started_at','finished_at'
+        'organization_id','entity_type','status','file_key','original_filename','mapping','total_rows','valid_rows','invalid_rows','error_report_key','created_by','started_at','finished_at'
     ];
 
     protected $casts = [
@@ -23,4 +23,3 @@ class ImportJob extends Model
 
     public function errors(): HasMany { return $this->hasMany(ImportJobError::class); }
 }
-

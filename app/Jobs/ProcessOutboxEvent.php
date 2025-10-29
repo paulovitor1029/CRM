@@ -29,7 +29,7 @@ class ProcessOutboxEvent implements ShouldQueue
         $evt = OutboxEvent::find($this->outboxId);
         if (!$evt) return;
         $rules = RuleDefinition::with('actions')
-            ->where('tenant_id', $evt->tenant_id)
+            ->where('organization_id', $evt->organization_id)
             ->where('event_key', $evt->event_key)
             ->where('enabled', true)
             ->get();
@@ -113,7 +113,7 @@ class ProcessOutboxEvent implements ShouldQueue
             $task = $tasks->create([
                 'title' => $this->tpl($params['title'] ?? 'Tarefa'),
                 'description' => $this->tpl($params['description'] ?? ''),
-                'tenant_id' => $params['tenant_id'] ?? 'default',
+                'organization_id' => $params['organization_id'] ?? 'default',
                 'sector_id' => $params['sector_id'] ?? null,
                 'priority' => $params['priority'] ?? 'normal',
             ], $params['user_id'] ?? null, 'rule');
@@ -134,7 +134,7 @@ class ProcessOutboxEvent implements ShouldQueue
             $title = $this->tpl($params['title'] ?? 'Notificação');
             $body = $this->tpl($params['body'] ?? '');
             \App\Models\Notification::create([
-                'tenant_id' => $params['tenant_id'] ?? 'default',
+                'organization_id' => $params['organization_id'] ?? 'default',
                 'user_id' => $userId,
                 'type' => 'rule.notification',
                 'title' => $title,

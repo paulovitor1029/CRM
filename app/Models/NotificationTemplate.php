@@ -9,6 +9,5 @@ class NotificationTemplate extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['tenant_id', 'key', 'title', 'body'];
+    protected $fillable = ['organization_id', 'key', 'title', 'body'];
 }
-

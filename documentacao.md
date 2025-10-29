@@ -386,3 +386,9 @@ Este documento descreve a arquitetura, padrÃµes e requisitos de operaÃ§Ã£o do Fa
 - CritÃ©rios
   - Cobertura >95% em fluxosâ€‘chave (autenticaÃ§Ã£o, regras, faturamento, tasks, importadores, observabilidade)
   - Checklist de release: `RELEASE_CHECKLIST.md`
+
+## Mudança Importante
+- Removidos planos/assinaturas e faturamento automático.
+- Introduzido modelo de Organizações: use organization_id em vez de tenant_id para todas as entidades e filtros.
+- Superadmin global cria e gerencia organizações e seus usuários.
+

@@ -24,16 +24,16 @@ class TaskService
     public function create(array $data, ?string $userId = null, ?string $origin = null): Task
     {
         return $this->db->transaction(function () use ($data, $userId, $origin) {
-            $tenant = $data['tenant_id'] ?? 'default';
+            $tenant = $data['organization_id'] ?? 'default';
             $sla = null;
             if (!empty($data['sla_policy_id'])) {
                 $sla = SlaPolicy::findOrFail($data['sla_policy_id']);
             } else {
-                $sla = SlaPolicy::where('tenant_id', $tenant)->where('key', 'default')->first();
+                $sla = SlaPolicy::where('organization_id', $tenant)->where('key', 'default')->first();
             }
 
             $task = Task::create([
-                'tenant_id' => $tenant,
+                'organization_id' => $tenant,
                 'sector_id' => $data['sector_id'] ?? null,
                 'title' => $data['title'],
                 'description' => $data['description'] ?? null,
@@ -64,7 +64,7 @@ class TaskService
                 'origin' => $origin,
             ]);
 
-            Log::info('task_created', ['task_id' => $task->id, 'tenant_id' => $tenant, 'user_id' => $userId]);
+            Log::info('task_created', ['task_id' => $task->id, 'organization_id' => $tenant, 'user_id' => $userId]);
             event(new TaskCreated($task->id, $tenant, $task->sector_id, $task->title));
             return $task->load(['labels']);
         });
@@ -105,7 +105,7 @@ class TaskService
             ]);
 
             Log::info('task_assigned', ['task_id' => $task->id, 'user_id' => $userId]);
-            event(new TaskAssigned($task->id, $task->tenant_id, $userId));
+            event(new TaskAssigned($task->id, $task->organization_id, $userId));
             return $task;
         });
     }
@@ -138,7 +138,7 @@ class TaskService
             ]);
 
             Log::info('task_completed', ['task_id' => $task->id, 'user_id' => $userId]);
-            event(new TaskCompleted($task->id, $task->tenant_id, $task->assignee_id));
+            event(new TaskCompleted($task->id, $task->organization_id, $task->assignee_id));
             return $task;
         });
     }

@@ -170,7 +170,7 @@ class ImportService
     {
         if ($entity === 'customers') {
             Customer::create([
-                'tenant_id' => 'default',
+                'organization_id' => 'default',
                 'name' => $data['name'] ?? '',
                 'email' => $data['email'] ?? null,
                 'phone' => $data['phone'] ?? null,
@@ -178,7 +178,7 @@ class ImportService
             ]);
         } elseif ($entity === 'products') {
             Product::firstOrCreate([
-                'tenant_id' => 'default',
+                'organization_id' => 'default',
                 'sku' => $data['sku'] ?? '',
             ], [
                 'name' => $data['name'] ?? '',
@@ -199,4 +199,3 @@ class ImportService
         }
     }
 }
-

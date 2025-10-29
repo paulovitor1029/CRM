@@ -9,13 +9,13 @@ use Illuminate\Support\Str;
 
 class FileUploadService
 {
-    public function presign(string $tenantId, ?string $userId, string $key, ?string $contentType = null, ?int $size = null, ?string $checksum = null, array $meta = []): array
+    public function presign(string $organizationId, ?string $userId, string $key, ?string $contentType = null, ?int $size = null, ?string $checksum = null, array $meta = []): array
     {
         $diskName = config('files.disk', env('FILES_DISK', config('filesystems.default', 'local')));
         $disk = Storage::disk($diskName);
 
         $record = FileObject::updateOrCreate([
-            'tenant_id' => $tenantId,
+            'organization_id' => $organizationId,
             'key' => $key,
         ], [
             'user_id' => $userId,
@@ -54,4 +54,3 @@ class FileUploadService
         ];
     }
 }
-

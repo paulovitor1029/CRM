@@ -10,6 +10,5 @@ class TaskLabel extends Model
 {
     use HasFactory, HasUuids;
 
-    protected $fillable = ['tenant_id', 'name', 'color'];
+    protected $fillable = ['organization_id', 'name', 'color'];
 }
-

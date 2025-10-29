@@ -10,6 +10,5 @@ class TenantFeatureFlag extends Model
 {
     use HasFactory, HasUuids;
 
-    protected $fillable = ['tenant_id','flag_key','enabled','version','updated_by'];
+    protected $fillable = ['organization_id','flag_key','enabled','version','updated_by'];
 }
-

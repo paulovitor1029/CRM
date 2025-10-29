@@ -20,15 +20,15 @@ class DocumentController
 
     public function index(Request $request): JsonResponse
     {
-        $tenant = (string) ($request->query('tenant_id') ?? 'default');
-        $list = Document::where('tenant_id', $tenant)->orderByDesc('updated_at')->paginate(20);
+        $tenant = (string) ($request->attributes->get('organization_id') ?? $request->query('organization_id') ?? 'default');
+        $list = Document::where('organization_id', $tenant)->orderByDesc('updated_at')->paginate(20);
         return response()->json(['data' => $list->items(), 'meta' => ['current_page' => $list->currentPage()]]);
     }
 
     public function store(DocumentStoreRequest $request): JsonResponse
     {
         $data = $request->validated();
-        $data['tenant_id'] = $data['tenant_id'] ?? 'default';
+        $data['organization_id'] = $data['organization_id'] ?? (string) ($request->attributes->get('organization_id') ?? $request->query('organization_id') ?? 'default');
         $data['owner_id'] = optional($request->user())->id;
         $doc = Document::create($data);
         if (!empty($data['content'])) {
@@ -85,4 +85,3 @@ class DocumentController
         return response()->json(['data' => $doc]);
     }
 }
-

@@ -8,7 +8,7 @@ it('uploads, maps, previews, validates and imports customers CSV', function () {
     $csv = "name,email,phone,status\nA,a@example.com,111,ativo\nB,b@example.com,222,ativo\n";
     Storage::disk('local')->put('imports/test_customers.csv', $csv);
 
-    $job = $this->postJson('/api/imports/upload?tenant_id=default', [
+    $job = $this->postJson('/api/imports/upload?organization_id=default', [
         'entity_type' => 'customers',
         'file_key' => 'imports/test_customers.csv',
     ])->assertCreated()->json('data');
@@ -37,4 +37,3 @@ it('uploads, maps, previews, validates and imports customers CSV', function () {
 
     $this->assertDatabaseHas('customers', ['email' => 'a@example.com']);
 });
-

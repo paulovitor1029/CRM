@@ -20,9 +20,9 @@ class FlowController
 
     public function index(Request $request): JsonResponse
     {
-        $tenant = (string) ($request->query('tenant_id') ?? 'default');
+        $tenant = (string) ($request->attributes->get('organization_id') ?? $request->query('organization_id') ?? 'default');
         $list = FlowDefinition::with(['states', 'transitions'])
-            ->where('tenant_id', $tenant)
+            ->where('organization_id', $tenant)
             ->orderBy('key')->orderByDesc('version')
             ->get();
         return response()->json(['data' => $list]);
@@ -31,7 +31,7 @@ class FlowController
     public function store(FlowStoreRequest $request): JsonResponse
     {
         $payload = $request->validated();
-        $payload['tenant_id'] = $payload['tenant_id'] ?? 'default';
+        $payload['organization_id'] = $payload['organization_id'] ?? (string) ($request->attributes->get('organization_id') ?? $request->query('organization_id') ?? 'default');
         $flow = $this->flows->create($payload);
         return response()->json(['data' => $flow], Response::HTTP_CREATED);
     }

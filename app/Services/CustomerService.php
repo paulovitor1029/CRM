@@ -19,9 +19,9 @@ class CustomerService
     public function create(array $data, ?string $userId = null, ?string $origin = null): Customer
     {
         return $this->db->transaction(function () use ($data, $userId, $origin) {
-            $tenant = $data['tenant_id'] ?? 'default';
+            $tenant = $data['organization_id'] ?? 'default';
             $customer = Customer::create([
-                'tenant_id' => $tenant,
+                'organization_id' => $tenant,
                 'external_id' => $data['external_id'] ?? null,
                 'name' => $data['name'],
                 'email' => $data['email'] ?? null,
@@ -74,7 +74,7 @@ class CustomerService
 
             Log::info('customer_created', [
                 'customer_id' => $customer->id,
-                'tenant_id' => $tenant,
+                'organization_id' => $tenant,
                 'user_id' => $userId,
                 'origin' => $origin,
             ]);
@@ -87,11 +87,10 @@ class CustomerService
     {
         $customer->loadMissing(['contacts', 'addresses', 'tags']);
         return [
-            'customer' => $customer->only(['id', 'tenant_id', 'external_id', 'name', 'email', 'phone', 'status', 'funnel_stage', 'meta']),
+            'customer' => $customer->only(['id', 'organization_id', 'external_id', 'name', 'email', 'phone', 'status', 'funnel_stage', 'meta']),
             'contacts' => $customer->contacts->map->only(['type', 'value', 'preferred', 'meta'])->values()->all(),
             'addresses' => $customer->addresses->map->only(['type', 'line1', 'line2', 'city', 'state', 'postal_code', 'country', 'meta'])->values()->all(),
             'tags' => $customer->tags->pluck('tag')->values()->all(),
         ];
     }
 }
-

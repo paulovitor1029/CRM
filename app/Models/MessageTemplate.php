@@ -10,6 +10,5 @@ class MessageTemplate extends Model
 {
     use HasFactory, HasUuids;
 
-    protected $fillable = ['tenant_id','channel','key','subject','body','version','updated_by'];
+    protected $fillable = ['organization_id','channel','key','subject','body','version','updated_by'];
 }
-

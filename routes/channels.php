@@ -6,8 +6,7 @@ Broadcast::channel('users.{id}', function ($user, $id) {
     return (string) $user->id === (string) $id;
 });
 
-Broadcast::channel('tenant.{tenantId}', function ($user, $tenantId) {
-    // If your user has tenant membership, validate here. Default allow for authenticated users.
+Broadcast::channel('organization.{organizationId}', function ($user, $organizationId) {
+    // Validate if user belongs to organization. For MVP, allow authenticated users.
     return (bool) $user;
 });
-

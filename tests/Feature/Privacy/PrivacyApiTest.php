@@ -4,7 +4,7 @@ use App\Models\Customer;
 use App\Models\PrivacyConsent;
 
 it('records and revokes consent, and produces access report', function () {
-    $cust = Customer::create(['tenant_id' => 'default', 'name' => 'John', 'status' => 'ativo']);
+    $cust = Customer::create(['organization_id' => 'default', 'name' => 'John', 'status' => 'ativo']);
     $c = $this->postJson('/api/privacy/consents', [
         'subject_type' => 'customer',
         'subject_id' => $cust->id,
@@ -22,7 +22,7 @@ it('records and revokes consent, and produces access report', function () {
 });
 
 it('anonymizes customer PII', function () {
-    $cust = Customer::create(['tenant_id' => 'default', 'name' => 'Alice', 'email' => 'alice@example.com', 'phone' => '123', 'status' => 'ativo']);
+    $cust = Customer::create(['organization_id' => 'default', 'name' => 'Alice', 'email' => 'alice@example.com', 'phone' => '123', 'status' => 'ativo']);
     $this->postJson('/api/privacy/anonymize', [
         'subject_type' => 'customer',
         'subject_id' => $cust->id,
@@ -30,4 +30,3 @@ it('anonymizes customer PII', function () {
     $cust->refresh();
     expect($cust->email)->toBeNull();
 });
-

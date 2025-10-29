@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 namespace App\Providers;
 
@@ -18,6 +18,6 @@ class EventServiceProvider extends ServiceProvider
         TaskCompleted::class => [BroadcastNotifications::class, OutboxEventRecorder::class],
         CustomerStageChanged::class => [BroadcastNotifications::class, OutboxEventRecorder::class],
         \App\Events\CustomerCreated::class => [OutboxEventRecorder::class],
-        \App\Events\PaymentApproved::class => [OutboxEventRecorder::class],
-    ];
+            ];
 }
+
