@@ -264,3 +264,20 @@ Este documento descreve a arquitetura, padrões e requisitos de operação do Fa
 - Critérios
   - Simulação de regra e logs detalhados (`rule_runs.logs`)
   - Reprocessamento (replay) suportado
+
+## Webhooks & API Pública (OAuth2 Client Credentials)
+- OAuth2 (Client Credentials)
+  - Endpoint: POST `/api/oauth/token` com `grant_type=client_credentials` e credenciais via body ou `Authorization: Basic base64(id:secret)`
+  - Resposta: `{ access_token, token_type: 'Bearer', expires_in }`
+  - Rotas públicas sob `/api/v1/*` exigem `Authorization: Bearer <token>`.
+- Cadastro de Webhooks
+  - Tabela `webhook_endpoints` por `tenant_id` e `event_key` (`task.assigned`, `task.completed`, `customer.stage.changed`, etc.)
+  - Endpoint: GET/POST `/api/webhooks` (interno, auth) e GET `/api/webhooks/deliveries`
+- Entrega (Outbound)
+  - HMAC SHA-256: header `X-Webhook-Signature: sha256=<hex(hmac(secret, timestamp+'.'+body))>`
+  - Headers: `X-Webhook-Event`, `X-Webhook-Id`, `X-Webhook-Timestamp`, `Idempotency-Key`
+  - Retries exponenciais (1m,2m,4m,...) com DLQ após `webhooks.max_attempts` (default 8)
+  - Fila: jobs `DispatchPendingWebhooks` e `DispatchWebhook`
+- Segurança
+  - Proteção contra replay via `X-Webhook-Timestamp` (o receptor deve validar janela)
+  - Idempotência garantida por `Idempotency-Key` e `unique(endpoint_id, outbox_id)`

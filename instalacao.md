@@ -165,6 +165,15 @@ Depois rode: `php artisan pest:install` (se aplicável) e `composer dump-autoloa
 - Replay: POST `/api/rules/replay/{outbox_id}`
 - Rodando: queue/worker precisa estar ativo para processar `ProcessOutbox`/`ProcessOutboxEvent`
 
+## Webhooks & API Pública
+- OAuth2 Client Credentials
+  - Crie um client: POST `/api/oauth/clients` (auth interno) → retorna `client_id` e `client_secret`
+  - Obtenha token: POST `/api/oauth/token` com `grant_type=client_credentials`
+  - Use nas rotas `/api/v1/*` com header `Authorization: Bearer <token>`
+- Webhooks
+  - Cadastre endpoints: POST `/api/webhooks` com `{ event_key, url, secret? }`
+  - Entregas assinadas com HMAC (`X-Webhook-Signature`) e `Idempotency-Key`; retries e DLQ automáticos
+
 ## Troubleshooting
 - Se `vendor/` não existir, execute `make composer-install`.
 - Se a aplicação não responder, verifique logs: `make logs`.

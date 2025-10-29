@@ -75,7 +75,10 @@ class ProcessOutboxEvent implements ShouldQueue
             }
         }
 
-        // Finalize outbox status if no remaining processing
+        // Enqueue webhooks for this event
+        app(\App\Services\WebhookService::class)->enqueueForOutbox($evt);
+
+        // Finalize outbox status
         $evt->status = 'processed';
         $evt->processed_at = now();
         $evt->save();
@@ -158,4 +161,3 @@ class ProcessOutboxEvent implements ShouldQueue
         return $template; // keep simple for MVP
     }
 }
-

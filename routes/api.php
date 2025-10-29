@@ -18,6 +18,10 @@ use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\RulesController;
+use App\Http\Controllers\OAuthTokenController;
+use App\Http\Controllers\OAuthClientsController;
+use App\Http\Controllers\WebhookController;
+use App\Http\Middleware\ClientCredentialsMiddleware;
 use App\Http\Middleware\DeviceSessionEnforcer;
 use App\Http\Middleware\EnforcePasswordPolicy;
 use App\Http\Middleware\RequestIdMiddleware;
@@ -119,4 +123,20 @@ Route::middleware([RequestIdMiddleware::class])->group(function () {
     Route::post('/rules/outbox', [RulesController::class, 'ingest']);
     Route::post('/rules/replay/{id}', [RulesController::class, 'replay']);
     Route::get('/rules/runs', [RulesController::class, 'runs']);
+});
+
+// OAuth2 (Client Credentials)
+Route::post('/oauth/token', [OAuthTokenController::class, 'issueToken']);
+Route::post('/oauth/clients', [OAuthClientsController::class, 'store'])->middleware(['auth']);
+
+// Webhook endpoints management (internal)
+Route::middleware(['auth'])->group(function () {
+    Route::get('/webhooks', [WebhookController::class, 'index']);
+    Route::post('/webhooks', [WebhookController::class, 'store']);
+    Route::get('/webhooks/deliveries', [WebhookController::class, 'deliveries']);
+});
+
+// Public API v1 protected by client credentials
+Route::prefix('v1')->middleware([ClientCredentialsMiddleware::class])->group(function () {
+    Route::get('/ping', function () { return response()->json(['pong' => true]); });
 });

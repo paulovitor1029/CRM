@@ -11,6 +11,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         $schedule->job(new RefreshMaterializedViews())->everyFifteenMinutes();
+        $schedule->job(new \App\Jobs\ProcessOutbox())->everyMinute();
+        $schedule->job(new \App\Jobs\DispatchPendingWebhooks())->everyMinute();
     }
 }
-
