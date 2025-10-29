@@ -203,6 +203,12 @@ Depois rode: `php artisan pest:install` (se aplicável) e `composer dump-autoloa
   - POST `/api/imports/{id}/start`
 - Erros: GET `/api/imports/{id}/errors` (amostra + `error_report_key` para CSV completo)
 
+## Admin por Tenant
+- Branding e configurações: GET `/api/admin/configs`, POST `/api/admin/configs/{scope}`
+- Campos customizados: GET/POST `/api/admin/custom-fields`
+- Feature flags: GET/POST `/api/admin/feature-flags`
+- Templates (push/email/WA): GET/POST `/api/admin/templates`
+
 ## Troubleshooting
 - Se `vendor/` não existir, execute `make composer-install`.
 - Se a aplicação não responder, verifique logs: `make logs`.

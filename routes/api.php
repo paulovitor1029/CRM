@@ -27,6 +27,7 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PrivacyController;
 use App\Http\Controllers\MetricsController;
 use App\Http\Controllers\ImportController;
+use App\Http\Controllers\TenantAdminController;
 use App\Http\Middleware\DeviceSessionEnforcer;
 use App\Http\Middleware\EnforcePasswordPolicy;
 use App\Http\Middleware\RequestIdMiddleware;
@@ -153,6 +154,16 @@ Route::middleware([RequestIdMiddleware::class])->group(function () {
     Route::post('/imports/{id}/start', [ImportController::class, 'start']);
     Route::get('/imports/{id}', [ImportController::class, 'show']);
     Route::get('/imports/{id}/errors', [ImportController::class, 'errors']);
+
+    // Admin & Tenant Config
+    Route::get('/admin/configs', [TenantAdminController::class, 'getConfigs']);
+    Route::post('/admin/configs/{scope}', [TenantAdminController::class, 'setConfig']);
+    Route::get('/admin/custom-fields', [TenantAdminController::class, 'listFields']);
+    Route::post('/admin/custom-fields', [TenantAdminController::class, 'upsertField']);
+    Route::get('/admin/feature-flags', [TenantAdminController::class, 'flags']);
+    Route::post('/admin/feature-flags', [TenantAdminController::class, 'setFlag']);
+    Route::get('/admin/templates', [TenantAdminController::class, 'templates']);
+    Route::post('/admin/templates', [TenantAdminController::class, 'upsertTemplate']);
 });
 
 // OAuth2 (Client Credentials)

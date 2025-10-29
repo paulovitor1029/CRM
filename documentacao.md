@@ -355,3 +355,20 @@ Este documento descreve a arquitetura, padrões e requisitos de operação do Fa
 - Critérios
   - Suporta CSV nativamente; XLSX pode ser adicionado com biblioteca compatível
   - Relatórios de erro e trilha auditável (status, tempos, contagens)
+
+## Admin & Configurações por Tenant
+- Branding e Operação
+  - `tenant_configs` com `scope`: `branding` (logo/cores), `domains` (domínios), `timezone` (TZ padrão), `holidays` (datas), `numbering` (regras de numeração)
+  - Endpoints: GET `/api/admin/configs`, POST `/api/admin/configs/{scope}` (versões com logs `tenant_config_logs`)
+- Templates
+  - `message_templates` por canal (`push|email|wa`) e `key`; versão e logs (`message_template_logs`)
+  - Endpoints: GET/POST `/api/admin/templates`
+- Campos Customizados
+  - Tabela `tenant_custom_fields` (entity, name, key, type: string|number|boolean|date|enum; required; visibility por papel; options; order; active; version)
+  - Logs em `tenant_custom_field_logs`
+  - Endpoints: GET/POST `/api/admin/custom-fields`
+- Feature Flags
+  - `tenant_feature_flags` (flag_key, enabled, version) com `tenant_feature_flag_logs`
+  - Endpoints: GET/POST `/api/admin/feature-flags`
+- Critérios
+  - Todas as mudanças versionadas e auditáveis (quem alterou, antes/depois, quando)
