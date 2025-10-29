@@ -13,6 +13,8 @@ use App\Http\Controllers\PlanController;
 use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\FileController;
+use App\Http\Controllers\DocumentController;
 use App\Http\Middleware\DeviceSessionEnforcer;
 use App\Http\Middleware\EnforcePasswordPolicy;
 use App\Http\Middleware\RequestIdMiddleware;
@@ -87,4 +89,19 @@ Route::middleware([RequestIdMiddleware::class])->group(function () {
     Route::get('/notifications', [NotificationController::class, 'index']);
     Route::post('/notifications/{id}/read', [NotificationController::class, 'markRead']);
     Route::post('/notifications/subscription', [NotificationController::class, 'saveSubscription']);
+
+    // Files (S3-compatible)
+    Route::get('/files', [FileController::class, 'index']);
+    Route::post('/files/presign', [FileController::class, 'presign']);
+    Route::post('/files/upload', [FileController::class, 'upload']);
+
+    // Documents & Versions
+    Route::get('/documents', [DocumentController::class, 'index']);
+    Route::post('/documents', [DocumentController::class, 'store']);
+    Route::get('/documents/{id}', [DocumentController::class, 'show']);
+    Route::put('/documents/{id}', [DocumentController::class, 'update']);
+    Route::delete('/documents/{id}', [DocumentController::class, 'destroy']);
+    Route::post('/documents/{id}/autosave', [DocumentController::class, 'autosave']);
+    Route::get('/documents/{id}/versions', [DocumentController::class, 'versions']);
+    Route::post('/documents/{id}/versions/{version}/rollback', [DocumentController::class, 'rollback']);
 });

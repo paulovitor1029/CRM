@@ -199,3 +199,24 @@ Este documento descreve a arquitetura, padrões e requisitos de operação do Fa
   - POST `/api/notifications/{id}/read` (marca como lida)
 - Horários de silêncio (quiet hours)
   - Configurados em `user_notification_prefs.preferences.quiet_hours` (start, end, timezone). Backend sempre grava in-app; push pode ser suprimido pelo front conforme prefs.
+
+## Documentos & Arquivos (S3, Auto-save, Versionamento)
+- Tabelas
+  - `file_objects` (chave, disk, size, content_type, checksum, uploaded_at, meta)
+  - `documents` (title, content corrente, current_version, autosave_at, sector_id?, meta)
+  - `document_versions` (version, content, created_by, created_at)
+  - `document_shares` (por papel `role_name` e/ou `sector_id`, `can_edit`)
+- Storage
+  - Disk configurável via `FILES_DISK` (S3-compatível). Presign de upload (PUT) quando S3 disponível; fallback para upload via backend.
+- Endpoints (Files)
+  - GET `/api/files` — lista arquivos (últimos 50)
+  - POST `/api/files/presign` — body `{ key, content_type?, size?, checksum?, meta? }` → `{ key, upload_url, headers }`
+  - POST `/api/files/upload` — fallback multipart com `file` e query `?key=...`
+- Endpoints (Documents)
+  - GET/POST `/api/documents`, GET/PUT/DELETE `/api/documents/{id}`
+  - POST `/api/documents/{id}/autosave` — cria nova versão transacional (incrementa `current_version`)
+  - GET `/api/documents/{id}/versions`, POST `/api/documents/{id}/versions/{version}/rollback`
+- Critérios
+  - Auto‑save transacional: cria registro em `document_versions` e atualiza `documents`
+  - Histórico recuperável via `versions` e `rollback`
+  - Acesso por compartilhamento (`document_shares`) por papel/setor (base p/ Policy)

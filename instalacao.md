@@ -142,6 +142,16 @@ Depois rode: `php artisan pest:install` (se aplicável) e `composer dump-autoloa
 - Central de Notificações
   - GET `/api/notifications` para feed recente; POST `/api/notifications/{id}/read` para marcar como lida.
 
+## Documentos & Arquivos (S3)
+- Configurar `.env` para storage S3 (ou local): `FILES_DISK=s3`, `AWS_*`
+- Uploads
+  - Pré-assinado: POST `/api/files/presign` → PUT direto no S3 com headers retornados
+  - Fallback: POST `/api/files/upload?key=...` + multipart `file`
+- Documentos (autosave e versões)
+  - Criar: POST `/api/documents` (opcional `content` inicial)
+  - Autosave: POST `/api/documents/{id}/autosave` com `{ content }`
+  - Versões: GET `/api/documents/{id}/versions`, rollback: POST `/api/documents/{id}/versions/{version}/rollback`
+
 ## Troubleshooting
 - Se `vendor/` não existir, execute `make composer-install`.
 - Se a aplicação não responder, verifique logs: `make logs`.
