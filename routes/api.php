@@ -25,11 +25,16 @@ use App\Http\Middleware\ClientCredentialsMiddleware;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PrivacyController;
+use App\Http\Controllers\MetricsController;
 use App\Http\Middleware\DeviceSessionEnforcer;
 use App\Http\Middleware\EnforcePasswordPolicy;
 use App\Http\Middleware\RequestIdMiddleware;
 
-Route::middleware([RequestIdMiddleware::class])->group(function () {
+use App\Http\Middleware\TenantContextMiddleware;
+use App\Http\Middleware\TraceContextMiddleware;
+use App\Http\Middleware\HttpMetricsMiddleware;
+
+Route::middleware([RequestIdMiddleware::class, TraceContextMiddleware::class, TenantContextMiddleware::class, HttpMetricsMiddleware::class])->group(function () {
     Route::post('/auth/login', [AuthController::class, 'login'])
         ->middleware(['throttle:api', EnforcePasswordPolicy::class])
         ->name('auth.login');
@@ -154,3 +159,6 @@ Route::middleware(['auth'])->group(function () {
 Route::prefix('v1')->middleware([ClientCredentialsMiddleware::class])->group(function () {
     Route::get('/ping', function () { return response()->json(['pong' => true]); });
 });
+
+// Prometheus metrics endpoint
+Route::get('/metrics', MetricsController::class);

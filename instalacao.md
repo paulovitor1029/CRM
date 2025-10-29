@@ -188,6 +188,11 @@ Depois rode: `php artisan pest:install` (se aplicável) e `composer dump-autoloa
 - Anonimização/pseudonimização: POST `/api/privacy/anonymize` (suporte para `user` e `customer`)
 - Políticas de retenção: tabela `data_retention_policies` (configurável por tenant)
 
+## Observabilidade
+- Logs JSON com correlação (`request_id`, `tenant_id`, `trace_id`)
+- Métricas Prometheus em `/api/metrics` (expor no Prometheus server)
+- Dashboards: arquivo `observability/dashboards/grafana-golden-signals.json`
+
 ## Troubleshooting
 - Se `vendor/` não existir, execute `make composer-install`.
 - Se a aplicação não responder, verifique logs: `make logs`.

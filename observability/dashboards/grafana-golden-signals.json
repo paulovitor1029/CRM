@@ -1,0 +1,12 @@
+{
+  "title": "FastHub Golden Signals",
+  "panels": [
+    {"type": "graph", "title": "HTTP Requests", "targets": [{"expr": "sum by (method,route,status) (http_requests_total)"}]},
+    {"type": "graph", "title": "HTTP 5xx Errors", "targets": [{"expr": "sum by (route) (http_errors_total)"}]},
+    {"type": "heatmap", "title": "HTTP Latency", "targets": [{"expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le,route))"}]},
+    {"type": "graph", "title": "DB Query Duration", "targets": [{"expr": "histogram_quantile(0.95, sum(rate(db_query_duration_seconds_bucket[5m])) by (le))"}]},
+    {"type": "graph", "title": "Queue Jobs", "targets": [{"expr": "sum by (queue) (queue_jobs_processed_total)"}]},
+    {"type": "stat", "title": "Tasks Overdue", "targets": [{"expr": "tasks_overdue_gauge"}]}
+  ]
+}
+

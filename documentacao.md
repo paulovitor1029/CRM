@@ -315,4 +315,23 @@ Este documento descreve a arquitetura, padrões e requisitos de operação do Fa
   - MVP: `anonymize` implementado (pseudonimização removendo PII principal); export pode usar endpoints existentes (ex.: `customers` + `documents`) ou evoluir com exportador dedicado
 - Critérios
   - Access logs gravados como append‑only na aplicação e consultáveis por titular
-  - Consents versionados, com IP e user‑agent registrados
+- Consents versionados, com IP e user‑agent registrados
+
+## Observabilidade (Logs, Métricas, Traces)
+- Logs estruturados
+  - JSON via Monolog com `request_id`, `tenant_id` e `trace_id` correlacionados (middlewares RequestId, TenantContext, TraceContext + CorrelationTap)
+- Métricas (Prometheus)
+  - Endpoint: GET `/api/metrics` (text format). Métricas:
+    - `http_requests_total{method,route,status,tenant}`
+    - `http_request_duration_seconds_bucket{le,method,route,status,tenant}` (histogram)
+    - `http_errors_total{route,status,tenant}`
+    - `db_query_duration_seconds_bucket{le}` (histogram)
+    - `queue_jobs_processed_total{queue}`, `queue_jobs_failed_total{queue}`
+    - `tasks_overdue_gauge{tenant}` (calculada on‑demand)
+- Tracing (OpenTelemetry ready)
+  - Middleware `TraceContextMiddleware` lê/gera `traceparent`, injeta `trace_id` em logs e propaga via header de resposta
+  - DB/Queue instrumentados para métricas de latência; integração com OTel pode ser adicionada por exporter
+- Dashboards (exemplo)
+  - `observability/dashboards/grafana-golden-signals.json` com painéis de tráfego, latência (p95), erros, jobs e tasks overdue
+- Critérios
+  - Golden signals instrumentados (latência, tráfego, erros, saturação) e testáveis via `/api/metrics`
