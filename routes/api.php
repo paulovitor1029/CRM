@@ -15,6 +15,8 @@ use App\Http\Controllers\TaskController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\FileController;
 use App\Http\Controllers\DocumentController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ReportsController;
 use App\Http\Middleware\DeviceSessionEnforcer;
 use App\Http\Middleware\EnforcePasswordPolicy;
 use App\Http\Middleware\RequestIdMiddleware;
@@ -104,4 +106,9 @@ Route::middleware([RequestIdMiddleware::class])->group(function () {
     Route::post('/documents/{id}/autosave', [DocumentController::class, 'autosave']);
     Route::get('/documents/{id}/versions', [DocumentController::class, 'versions']);
     Route::post('/documents/{id}/versions/{version}/rollback', [DocumentController::class, 'rollback']);
+
+    // Dashboard & Reports
+    Route::get('/dashboard/widgets', [DashboardController::class, 'widgets']);
+    Route::post('/reports/export', [ReportsController::class, 'export']);
+    Route::get('/reports/exports/{id}', [ReportsController::class, 'show']);
 });

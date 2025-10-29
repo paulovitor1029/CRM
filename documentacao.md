@@ -220,3 +220,20 @@ Este documento descreve a arquitetura, padrões e requisitos de operação do Fa
   - Auto‑save transacional: cria registro em `document_versions` e atualiza `documents`
   - Histórico recuperável via `versions` e `rollback`
   - Acesso por compartilhamento (`document_shares`) por papel/setor (base p/ Policy)
+
+## Relatórios & Dashboard (KPIs + Visões Materializadas)
+- Visões Materializadas (PostgreSQL)
+  - `mrr_por_mes`: soma mensal do MRR (assinaturas ativas/trial) por tenant
+  - `churn_por_mes`: assinaturas canceladas por mês
+  - `aging_pendencias`: pendências abertas por faixas de tempo (lt_24h, 1_3d, gt_3d)
+  - `produtividade_setor`: tarefas concluídas por setor por dia
+  - `conversoes_funil`: contagem de transições por pipeline por dia
+- Endpoints
+  - GET `/api/dashboard/widgets` → retorna payload com `mrr`, `churn`, `aging`, `prod`, `funnel`
+  - POST `/api/reports/export` → body `{ report_key, format (csv|xlsx|pdf), params? }` cria exportação assíncrona
+  - GET `/api/reports/exports/{id}` → polling de status (`pending|processing|completed|failed`) e `file_key` quando pronto
+- Jobs
+  - `RefreshMaterializedViews` agenda atualização a cada 15 min (Scheduler)
+- Critérios
+  - Consultas rápidas para widgets graças às materialized views (índices por tenant e período)
+  - Exportações assíncronas via CSV (compatível com Excel); `xlsx/pdf` podem ser mapeados para CSV inicialmente

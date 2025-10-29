@@ -152,6 +152,12 @@ Depois rode: `php artisan pest:install` (se aplicável) e `composer dump-autoloa
   - Autosave: POST `/api/documents/{id}/autosave` com `{ content }`
   - Versões: GET `/api/documents/{id}/versions`, rollback: POST `/api/documents/{id}/versions/{version}/rollback`
 
+## Relatórios & Dashboard
+- Materialized Views: criadas via migração; atualizadas a cada 15 min pelo Scheduler.
+- Endpoints
+  - GET `/api/dashboard/widgets` (KPIs prontos p/ renderização rápida)
+  - POST `/api/reports/export` + GET `/api/reports/exports/{id}` para export assíncrona (CSV; compatível com Excel)
+
 ## Troubleshooting
 - Se `vendor/` não existir, execute `make composer-install`.
 - Se a aplicação não responder, verifique logs: `make logs`.
