@@ -22,6 +22,8 @@ use App\Http\Controllers\OAuthTokenController;
 use App\Http\Controllers\OAuthClientsController;
 use App\Http\Controllers\WebhookController;
 use App\Http\Middleware\ClientCredentialsMiddleware;
+use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Middleware\DeviceSessionEnforcer;
 use App\Http\Middleware\EnforcePasswordPolicy;
 use App\Http\Middleware\RequestIdMiddleware;
@@ -123,6 +125,11 @@ Route::middleware([RequestIdMiddleware::class])->group(function () {
     Route::post('/rules/outbox', [RulesController::class, 'ingest']);
     Route::post('/rules/replay/{id}', [RulesController::class, 'replay']);
     Route::get('/rules/runs', [RulesController::class, 'runs']);
+
+    // Billing
+    Route::get('/invoices', [InvoiceController::class, 'index']);
+    Route::post('/invoices', [InvoiceController::class, 'store']);
+    Route::post('/payments', [PaymentController::class, 'store']);
 });
 
 // OAuth2 (Client Credentials)

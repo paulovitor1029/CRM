@@ -174,6 +174,14 @@ Depois rode: `php artisan pest:install` (se aplicável) e `composer dump-autoloa
   - Cadastre endpoints: POST `/api/webhooks` com `{ event_key, url, secret? }`
   - Entregas assinadas com HMAC (`X-Webhook-Signature`) e `Idempotency-Key`; retries e DLQ automáticos
 
+## Faturamento Básico
+- Emissão de faturas
+  - POST `/api/invoices` com `{ subscription_id, bill_at? }`
+  - GET `/api/invoices` para listar últimas faturas
+- Pagamentos
+  - POST `/api/payments` com `{ invoice_id, status (pending|paid|failed), amount_cents, currency?, method?, external_id? }`
+  - Ao marcar como paid, evento `PaymentApproved` é emitido (integra com motor de regras)
+
 ## Troubleshooting
 - Se `vendor/` não existir, execute `make composer-install`.
 - Se a aplicação não responder, verifique logs: `make logs`.

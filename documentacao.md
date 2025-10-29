@@ -281,3 +281,23 @@ Este documento descreve a arquitetura, padrões e requisitos de operação do Fa
 - Segurança
   - Proteção contra replay via `X-Webhook-Timestamp` (o receptor deve validar janela)
   - Idempotência garantida por `Idempotency-Key` e `unique(endpoint_id, outbox_id)`
+
+## Faturamento Básico (Faturas, Pagamentos)
+- Tabelas
+  - `invoices` (tenant, customer, subscription?, period_start/end, status, subtotal/discount/courtesy/total em centavos)
+  - `invoice_items` (tipo: plan|addon|product|prorate|courtesy|adjustment; quantity, unit_price_cents, total_cents)
+  - `payments` (invoice_id, status: pending|paid|failed, amount_cents, method, paid_at, external_id, erro)
+  - `invoice_logs` (auditoria before/after; actions: issue|payment|update|cancel)
+- Regras
+  - Pró‑rata: quando `subscription.starts_at` no meio do mês e `pro_rata=true`, gera item `prorate` proporcional aos dias ativos no período
+  - Ciclos: mensal (base), anual pode ser tratado via planos/itens; MVP cobre mensal (um período)
+  - Cortesias: `subscription.courtesy_until >= period_end` zera valores com item `courtesy`
+- Endpoints
+  - GET `/api/invoices` (listar)
+  - POST `/api/invoices` (emitir para `subscription_id` e `bill_at?`)
+  - POST `/api/payments` (registrar status do pagamento)
+- Integração com Regras
+  - Ao registrar `payments.status=paid` → evento `PaymentApproved` é disparado e cai no `outbox` (motor de regras)
+- Critérios
+  - Cálculo conferível (tests cobrem emissão, cortesia e disparo de pagamento aprovado)
+  - Auditoria em `invoice_logs`
