@@ -111,6 +111,17 @@ Depois rode: `php artisan pest:install` (se aplicável) e `composer dump-autoloa
   - Body: `{ "pipeline_key": "vendas", "to_stage": "qualificado", "justification": "verificado" }`
   - Emite evento `CustomerStageChanged` e grava log
 
+## Catálogo (Produtos/Planos/Add-ons/Bundles) e Assinaturas
+- Produtos
+  - GET `/api/products` | POST `/api/products`
+  - Campos: `name`, `sku`, `price_cents`, `currency`, `metadata{}`
+- Planos
+  - GET `/api/plans` | POST `/api/plans`
+  - Campos: `product_id`, `billing_interval` (day|week|month|year), `billing_period`, `trial_days`, `pro_rata`, `courtesy_days`, `limits{}`
+- Assinaturas
+  - GET `/api/subscriptions` | POST `/api/subscriptions`
+  - Campos: `customer_id`, `plan_id?`, `items[]` (tipos: plan|addon|product), `starts_at?`, `trial_ends_at?`, `pro_rata?`, `courtesy_until?`, `limits{}`
+
 ## Troubleshooting
 - Se `vendor/` não existir, execute `make composer-install`.
 - Se a aplicação não responder, verifique logs: `make logs`.

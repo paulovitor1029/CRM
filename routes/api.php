@@ -8,6 +8,9 @@ use App\Http\Controllers\SectorController;
 use App\Http\Controllers\FlowController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\CustomerPipelineController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\PlanController;
+use App\Http\Controllers\SubscriptionController;
 use App\Http\Middleware\DeviceSessionEnforcer;
 use App\Http\Middleware\EnforcePasswordPolicy;
 use App\Http\Middleware\RequestIdMiddleware;
@@ -61,4 +64,12 @@ Route::middleware([RequestIdMiddleware::class])->group(function () {
     Route::get('/customers', [CustomerController::class, 'index']);
     Route::post('/customers', [CustomerController::class, 'store']);
     Route::post('/customers/{id}/transition', [CustomerPipelineController::class, 'transition']);
+
+    // Catalog & Subscriptions
+    Route::get('/products', [ProductController::class, 'index']);
+    Route::post('/products', [ProductController::class, 'store']);
+    Route::get('/plans', [PlanController::class, 'index']);
+    Route::post('/plans', [PlanController::class, 'store']);
+    Route::get('/subscriptions', [SubscriptionController::class, 'index']);
+    Route::post('/subscriptions', [SubscriptionController::class, 'store']);
 });
