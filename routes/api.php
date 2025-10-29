@@ -17,6 +17,7 @@ use App\Http\Controllers\FileController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ReportsController;
+use App\Http\Controllers\RulesController;
 use App\Http\Middleware\DeviceSessionEnforcer;
 use App\Http\Middleware\EnforcePasswordPolicy;
 use App\Http\Middleware\RequestIdMiddleware;
@@ -111,4 +112,11 @@ Route::middleware([RequestIdMiddleware::class])->group(function () {
     Route::get('/dashboard/widgets', [DashboardController::class, 'widgets']);
     Route::post('/reports/export', [ReportsController::class, 'export']);
     Route::get('/reports/exports/{id}', [ReportsController::class, 'show']);
+
+    // Rules Engine
+    Route::post('/rules', [RulesController::class, 'create']);
+    Route::post('/rules/simulate', [RulesController::class, 'simulate']);
+    Route::post('/rules/outbox', [RulesController::class, 'ingest']);
+    Route::post('/rules/replay/{id}', [RulesController::class, 'replay']);
+    Route::get('/rules/runs', [RulesController::class, 'runs']);
 });

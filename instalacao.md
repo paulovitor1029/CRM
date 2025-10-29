@@ -158,6 +158,13 @@ Depois rode: `php artisan pest:install` (se aplicável) e `composer dump-autoloa
   - GET `/api/dashboard/widgets` (KPIs prontos p/ renderização rápida)
   - POST `/api/reports/export` + GET `/api/reports/exports/{id}` para export assíncrona (CSV; compatível com Excel)
 
+## Motor de Regras (MVP)
+- Criar regra: POST `/api/rules` com `{ name, event_key, conditions?, actions[] }`
+- Simular: POST `/api/rules/simulate` com `{ event_key, payload }`
+- Ingerir evento manual: POST `/api/rules/outbox` com `{ event_key, payload }`
+- Replay: POST `/api/rules/replay/{outbox_id}`
+- Rodando: queue/worker precisa estar ativo para processar `ProcessOutbox`/`ProcessOutboxEvent`
+
 ## Troubleshooting
 - Se `vendor/` não existir, execute `make composer-install`.
 - Se a aplicação não responder, verifique logs: `make logs`.

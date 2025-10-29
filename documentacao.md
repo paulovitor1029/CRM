@@ -237,3 +237,30 @@ Este documento descreve a arquitetura, padrões e requisitos de operação do Fa
 - Critérios
   - Consultas rápidas para widgets graças às materialized views (índices por tenant e período)
   - Exportações assíncronas via CSV (compatível com Excel); `xlsx/pdf` podem ser mapeados para CSV inicialmente
+
+## Motor de Regras (Event-Driven) — MVP
+- Tabelas
+  - `rule_definitions` (tenant_id, name, event_key, conditions[], enabled)
+  - `rule_actions` (rule_id, type [create_task|change_stage|send_notification|webhook], position, params{})
+  - `outbox` (event_key, payload{}, status, attempts, last_error, processed_at)
+  - `rule_runs` (rule_id, outbox_id, status, attempts, logs{}, started_at, finished_at) com unique (rule_id, outbox_id)
+- Eventos de Domínio
+  - Exemplos implementados: `task.created`, `task.assigned`, `task.completed`, `customer.created`, `customer.stage.changed`, `payment.approved`
+  - Listener `OutboxEventRecorder` persiste em `outbox` para reprocessamento/replay
+- Execução
+  - Job `ProcessOutbox` enfileira pendentes; `ProcessOutboxEvent` avalia regras e executa ações (idempotência via `rule_runs`)
+  - DLQ: falhas marcadas em `rule_runs.status=failed` e `outbox.status` atualizado
+- Ações suportadas
+  - `create_task` (usa `TaskService`)
+  - `change_stage` (usa `PipelineService`)
+  - `send_notification` (registra em `notifications`)
+  - `webhook` (HTTP; controlado por `rules.webhooks_enabled`)
+- API
+  - POST `/api/rules` (criar regra com ações)
+  - POST `/api/rules/simulate` (simular matching de regras para `{ event_key, payload }`)
+  - POST `/api/rules/outbox` (ingerir evento manualmente)
+  - POST `/api/rules/replay/{id}` (reprocessar outbox)
+  - GET `/api/rules/runs` (últimas execuções)
+- Critérios
+  - Simulação de regra e logs detalhados (`rule_runs.logs`)
+  - Reprocessamento (replay) suportado
