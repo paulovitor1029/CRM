@@ -214,7 +214,7 @@ Depois rode: `php artisan pest:install` (se aplicável) e `composer dump-autoloa
 - Se a aplicação não responder, verifique logs: `make logs`.
 - Banco indisponível? Aguarde healthcheck concluir (`compose.yaml` tem healthchecks) ou rode `docker compose ps`.
 
-## Mudan�a Importante
+## Mudançaa Importante
 - Billing (planos/assinaturas) removido do sistema (tabelas, models, endpoints, testes).
-- Multitenancy agora usa organiza��es. Substitua qualquer uso de tenant_id por organization_id. Contexto ativo via OrganizationContextMiddleware e endpoints /api/organizations. 
+- Multitenancy agora usa organizações. Substitua qualquer uso de tenant_id por organization_id. Contexto ativo via OrganizationContextMiddleware e endpoints /api/organizations. 
 

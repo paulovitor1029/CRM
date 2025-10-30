@@ -1,0 +1,25 @@
+#!/usr/bin/env php
+<?php
+
+use Illuminate\Contracts\Console\Kernel;
+
+define('LARAVEL_START', microtime(true));
+
+$autoload = __DIR__.'/vendor/autoload.php';
+if (!file_exists($autoload)) {
+    fwrite(STDERR, "Composer dependencies missing. Run: composer install\n");
+    exit(1);
+}
+require $autoload;
+
+$app = require __DIR__.'/bootstrap/app.php';
+
+$status = $app->make(Kernel::class)->handle(
+    $input = new Symfony\Component\Console\Input\ArgvInput,
+    new Symfony\Component\Console\Output\ConsoleOutput,
+);
+
+$app->make(Kernel::class)->terminate($input, $status);
+
+exit($status);
+
